@@ -23,10 +23,13 @@
       position: relative;
       top: -30px;
     }
-    #timer { 
+    #timer {
+      white-space: nowrap; /* ensures the text stays in one line */
+      width: auto;         /* automatically adjusts to content */
       font-size: 15px;
       color: #b22222;
       font-weight:700;
+      /*margin-right: 35px;*/
     }
     #layout { 
       display:grid; 
@@ -355,7 +358,7 @@ function submitExam(){
   
   // grade
   let score = 0, answered = 0;
-  let reportScore = "<h2>Exam Results</h2>";
+  let reportScore = '<hr class="results-separator"><h2>Exam Results:</h2>';
   let reportHtml = "";
 
 
