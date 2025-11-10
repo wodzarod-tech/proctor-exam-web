@@ -216,7 +216,6 @@ window.onload = function() {
   initCameraAndPrepareRecording().then(() => {
     // Load questions
     const saved = localStorage.getItem("saveContent");
-    debugger;
     if (saved) {
       parseQuestions(saved);
     }
