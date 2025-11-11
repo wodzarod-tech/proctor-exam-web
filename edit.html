@@ -1,166 +1,304 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <title>Exam Title</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 16px;
-      background: #f7f9fb;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      color:#111;
-    }
-    header { 
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      position: relative;
-      top: -30px;
-    }
-    #layout { 
-      display: none; /* hidden until file chosen */
-      margin-top:20px; 
-    }
-    .panel { 
-      background:white; 
-      padding:12px; 
-      border-radius:8px; 
-      box-shadow:0 1px 6px rgba(0,0,0,0.08) 
-    }
-    #exam .question { 
-      margin-bottom:12px; 
-    }
-    #exam[contenteditable="true"] {
-      outline: 2px dashed #007bff;
-      padding: 8px;
-      min-height: 100px;
-      cursor: text;
-    }
-    #exam[contenteditable="true"]:focus {
-      outline: 2px solid #1e6fff;
-      background-color: #f0f8ff;
-    }
-    label { 
-      cursor:pointer 
-    }
-    button { 
-      padding:8px 12px; 
-      border-radius:6px; 
-      border:0; 
-      background:#1e6fff; 
-      color:white; 
-      cursor:pointer 
-    }
-    button.secondary { 
-      background:#444; 
-      margin-left:8px 
-    }
-	  .question pre {
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      padding: 4px 8px;
-      margin: 2px 0;
-      border-radius: 4px;
-      display: inline-block;
-      white-space: pre-wrap; /* keep line breaks and wrap long lines */
-      font-family: monospace;
-      font-size: 14px;
-    }
-    .button-group {
-      display: none; /* required for margin:auto centering */
-      margin: 40px auto 0;
-      background: linear-gradient(90deg, #6aa3ff, #1ea3ff, #0fa0ff);
-      border-radius: 12px;
-      padding: 10px 40px;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-      font-size: 16px;
-    }
-    .button-group:hover {
-      opacity: 0.6;
-    }
-  </style>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 16px;
+    background: #f7f9fb;
+    color: #111;
+  }
+
+  header {
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  #layout {
+    display: none; /* hidden until file chosen */
+    margin-top:20px;
+  }
+
+  .panel {
+    background:white;
+    padding:12px;
+    border-radius:8px;
+    box-shadow:0 1px 6px rgba(0,0,0,0.08);
+  }
+
+  /* small panel style used for generated groups too */
+  .small-panel {
+    background:white;
+    width: 80%;
+    max-width: 780px;
+    padding: 0; /* we'll handle padding in children so boxes join properly */
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    overflow: hidden; /* keep rounded corners when children sit flush */
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* Joined textareas styling */
+  .joined-textareas {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .joined-textareas textarea {
+    width: 100%;
+	height: 100px;
+    min-height: 60px;
+    padding: 10px;
+    margin: 0;               /* removes default margins so they sit flush */
+    border: 0;               /* we'll use separators to mimic borders */
+    outline: none;
+    font-size: 14px;
+    resize: vertical;
+    background: #fff;
+  }
+
+  /* create subtle separators between the textareas */
+  .joined-textareas textarea + textarea {
+    border-top: 1px solid #e6e6e6;
+  }
+
+  /* Add slight padding around the set so the group feels consistent */
+  .panel-inner {
+    padding: 10px;
+  }
+
+  /* Add button below the title */
+  #addBoxBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+  #addBoxBtn:hover { transform: scale(1.1); }
+
+  #saveAllBtn {
+    position: fixed;
+    bottom: 90px; /* places it right above addBoxBtn (which is at 20px) */
+    right: 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+  #saveAllBtn:hover { transform: scale(1.1); }
+
+  /* container for generated panels (outside the #layout) */
+  #textboxArea {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  /* ---------- Fake File Explorer Modal ---------- */
+  .modal-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-window {
+    background: #fff;
+    width: 450px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    background: linear-gradient(#0078d7, #005a9e);
+    color: white;
+    padding: 8px 12px;
+    font-size: 15px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-body label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .modal-body input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #999;
+    border-radius: 4px;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f0f0f0;
+    border-top: 1px solid #ccc;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .modal-footer button {
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #888;
+  }
+
+  .save-btn { background: #0078d7; color: white; border-color: #0078d7; }
+  .cancel-btn { background: #fff; }
+
+  #loadFileBtn {
+    position: fixed;
+    bottom: 160px; /* above Save and + buttons */
+    right: 20px;
+    background: #ffc107;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+  #loadFileBtn:hover {
+    transform: scale(1.1);
+  }
+  #homeBtn {
+    position: fixed;
+    bottom: 230px; /* above the Load button */
+    right: 20px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  #homeBtn:hover {
+    transform: scale(1.1);
+    background: #0b5ed7;
+  }
+</style>
 </head>
 <body>
   <header>
-    <h1>Create Exam</h1>
+    <h1>Edit Exam</h1>
+    <button id="addBoxBtn" title="Add question group"><i class="fa fa-plus" aria-hidden="true"></i></button>
+	  <button id="saveAllBtn">Save</button>
+    <button id="loadFileBtn" title="Load exam from file"><i class="fa fa-folder-open"></i></button>
+    <button id="homeBtn" title="Go Home"><i class="fa fa-house"></i></button>
   </header>
 
-    <!-- File input moved just below the header -->
-  <div style="text-align:center; margin-top:-50px;">
-    <input type="file" id="fileInput" accept=".txt" style="margin-top:10px;">
-  </div>
+  <input type="file" id="fileInput" accept=".txt" style="display:none">
 
-  <div id="layout">
-    <div id="content" class="panel" class="center-box">
+  <div id="layout" style="margin-top:16px;">
+    <div id="content" class="panel">
       <div id="exam" contenteditable="true"></div>
 
-      <button id="submitBtn" class="button-group">Save</button>
-      <button id="homeBtn" class="button-group" onclick="window.location.href='index.html'">Go Home</button>
+      <button id="submitBtn" class="button-group" style="display:none; margin-top:12px;">Save</button>
+      <button id="homeBtn" class="button-group" onclick="window.location.href='index.html'" style="display:none; margin-top:12px;">Go Home</button>
 
       <div id="result" style="margin-top:12px"></div>
     </div>
   </div>
 
+  <!-- Panels with groups of 3 textareas will appear here (outside layout) -->
+  <div id="textboxArea"></div>
+
 <script>
 /* -------------------------
-   Exam parsing & rendering
+   Existing exam logic (kept functional)
    ------------------------- */
-let answers = [];        // expected answers, in order
-let timeLeft = 60 * 60;   // default: 15 minutes, change before start
-let timerInterval = null;
-let recordingActive = false;
+let answers = [];
 let oneAtTime = true;
 let currentIndex = 0;
+let counter = 0;
 
-document.getElementById('fileInput').addEventListener('change', handleFile);
 document.getElementById('submitBtn').addEventListener('click', submitExam);
+document.getElementById('addBoxBtn').addEventListener('click', addThreeTextboxes);
+document.getElementById('saveAllBtn').addEventListener('click', saveAllTextboxes);
 
-// Load questions
-function handleFile(ev){
-  const f = ev.target.files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = e => {
-    parseQuestions(e.target.result);
-    
-    // ✅ show layout once file is loaded
-    document.getElementById('layout').style.display = 'grid';
+document.getElementById('loadFileBtn').addEventListener('click', () => {
+    document.getElementById('fileInput').click(); // open file dialog
+});
 
-    // reveal all questions
-    document.querySelectorAll('#exam .question').forEach(q=> q.style.display = '');
+document.getElementById('homeBtn').addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
 
-    // show buttons
-    document.getElementById('submitBtn').style.display = 'block'; // show
-    document.getElementById('homeBtn').style.display = 'block'; // show
-  }
-  r.readAsText(f);
-} 
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const content = event.target.result;
+        loadTextIntoPanels(content);
+    };
+    reader.readAsText(file);
+});
 
 function parseQuestions(text){
-  // split by blocks that start with '*' (like your sample)  
-  const blocks = text
-  .split(/\n\s*\*/g)  // split only when * starts a new block
-  .map(b => b.replace(/^\s*\*/, "").trim())  // remove leading *
-  .filter(Boolean);
-  
+  const blocks = text.split(/\n\s*\*/g)
+    .map(b => b.replace(/^\s*\*/, "").trim())
+    .filter(Boolean);
+
   answers = [];
   const examDiv = document.getElementById('exam');
   examDiv.innerHTML = '';
   blocks.forEach((block, idx) => {
-    // split off "answer =" if present
     const parts = block.split(/answer\s*=\s*/i);
     const qPart = parts[0].trim();
-	const ans = parts[1]
+    const ans = parts[1]
       ? parts[1].trim().split(",").map(a => a.trim().toLowerCase())
       : [];
     answers.push(ans);
@@ -169,40 +307,23 @@ function parseQuestions(text){
     container.className = 'question';
     container.id = 'q' + idx;
 
-    // first non-empty line is question title
-    const lines = qPart.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const lines = qPart.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     const title = lines.shift() || `Question ${idx+1}`;
     const h = document.createElement('h3');
     h.textContent = `${idx+1}: ${title}`;
     container.appendChild(h);
 
-	const correctAns = answers[idx];  // array of correct answers
-	const inputType = correctAns.length > 1 ? "checkbox" : "radio";
+    const inputType = ans.length > 1 ? "checkbox" : "radio";
 
-	lines.forEach((line, i) => {
-      // options usually like "a. text"
+    lines.forEach((line) => {
       const optMatch = line.match(/^([a-z])\.\s*(.*)$/);
       if(optMatch){
-        const opt = optMatch[1].toLowerCase();
-		
-		// collect multi-line continuation
-		let optText = optMatch[2];
-		let j = i + 1;
-		while (j < lines.length && /^\s/.test(lines[j])) {
-		  optText += "\n" + lines[j];
-		  j++;
-		}
-		i = j - 1; // skip collected lines
-	
-		// escape before inserting
-		const safeText = escapeHtml(optText);
-  
+        const safeText = escapeHtml(optMatch[2]);
         const label = document.createElement('label');
-        label.innerHTML = `<input type="${inputType}" name="q${idx}" value="${opt}"> ${optMatch[1]}. ${safeText}`;
-		container.appendChild(label);
+        label.innerHTML = `<input type="${inputType}" name="q${idx}" value="${optMatch[1].toLowerCase()}"> ${optMatch[1]}. ${safeText}`;
+        container.appendChild(label);
         container.appendChild(document.createElement('br'));
       } else {
-        // non-option lines (extra) - show as text
         const p = document.createElement('p');
         p.textContent = line;
         container.appendChild(p);
@@ -212,17 +333,11 @@ function parseQuestions(text){
     examDiv.appendChild(container);
   });
 
-  // if oneAtTime default off, show all; otherwise show only first
   if(oneAtTime) showQuestion(0);
 }
 
-document.querySelectorAll('#exam input').forEach(inp => {
-	  inp.disabled = false;   // make sure it’s enabled
-	  inp.checked = false;    // uncheck it
-	});
-
 function escapeHtml(str) {
-  return str
+  return String(str || '')
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -230,41 +345,15 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-/* -------------------------
-   Grading / Submit
-   ------------------------- */
 function submitExam(){
-
-  const text = document.getElementById("exam").innerText; // get editable content
+  const text = document.getElementById("exam").innerText;
   const blob = new Blob([text], { type: "text/plain" });
-
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-
   a.href = url;
-  a.download = "exam_content.txt";   // ✅ file name
+  a.download = "exam_content.txt";
   a.click();
-
   URL.revokeObjectURL(url);
-}
-
-/* -------------------------
-   One question at a time
-   ------------------------- */
-function toggleOneAtTime(){
-  oneAtTime = !oneAtTime;
-  const btn = document.getElementById('toggleOneAtTime');
-  const icon = btn.querySelector('i');
-
-  if(oneAtTime) {
-    btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
-    showQuestion(0);
-  }
-  else {
-    // reveal all
-    btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-    document.querySelectorAll('#exam .question').forEach(q=> q.style.display = '');
-  }
 }
 
 function showQuestion(index){
@@ -276,14 +365,185 @@ function showQuestion(index){
 }
 
 /* -------------------------
-   Camera + MediaRecorder
+   New: Add panel with 3 joined textareas (Question, Options, Answer)
+   The textareas are appended so they touch each other (no gap)
    ------------------------- */
-let mediaStream = null;
-let mediaRecorder = null;
-let recordedChunks = [];
-let snapshotTimer = null;
+function addThreeTextboxes() {
+  counter++;
+  
+  const textboxArea = document.getElementById('textboxArea');
 
-const toggleRecordingBtn = document.getElementById('toggleRecording');
+  // panel wrapper (keeps consistent styling with other panels)
+  const panel = document.createElement('div');
+  panel.className = 'small-panel';
+  panel.style.position = 'relative'; // so the number badge and delete button can be placed inside
+
+  // container for number badge and delete button
+  const topControls = document.createElement('div');
+  //topControls.style.position = 'absolute';
+  topControls.style.top = '-10px';
+  topControls.style.left = '-10px';
+  topControls.style.display = 'flex';
+  topControls.style.alignItems = 'center';
+  topControls.style.gap = '6px';
+
+  // number badge
+  const numberLabel = document.createElement('div');
+  numberLabel.textContent = `${counter}`;
+  Object.assign(numberLabel.style, {
+    backgroundColor: 'rgb(114,150,188)',
+    color: 'white',
+    width: '28px',
+    height: '28px',
+    //borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    fontSize: '14px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+  });
+
+  // delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+  Object.assign(deleteBtn.style, {
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '26px',
+    height: '26px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '14px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    panel.remove();
+    updatePanelNumbers(); // renumber after deletion
+  });
+
+  // add badge and delete button to the top controls
+  topControls.appendChild(numberLabel);
+  topControls.appendChild(deleteBtn);
+  panel.appendChild(topControls);
+
+  // inner padding for the joined textareas
+  const inner = document.createElement('div');
+  inner.className = 'panel-inner';
+
+  // container for the joined textareas
+  const joined = document.createElement('div');
+  joined.className = 'joined-textareas';
+
+  // placeholders in the requested order
+  const placeholders = ['Question', 'Options', 'Answer (ex: a,b)'];
+
+  placeholders.forEach(ph => {
+    const ta = document.createElement('textarea');
+    ta.placeholder = ph;
+    ta.setAttribute('aria-label', ph);
+    joined.appendChild(ta);
+  });
+
+  // assemble panel
+  inner.appendChild(joined);
+  panel.appendChild(inner);
+  textboxArea.appendChild(panel);
+
+  // focus the first textarea
+  const first = joined.querySelector('textarea');
+  if (first) first.focus();
+}
+
+/* Helper: Renumber all panels after one is deleted */
+function updatePanelNumbers() {
+  const panels = document.querySelectorAll('#textboxArea .small-panel');
+  panels.forEach((panel, idx) => {
+    const label = panel.querySelector('div > div');
+    if (label) label.textContent = `${idx + 1}`;
+  });
+}
+
+function saveAllTextboxes() {
+  const panels = document.querySelectorAll('#textboxArea .small-panel');
+  if (panels.length === 0) {
+    alert("No panels to save!");
+    return;
+  }
+
+  // Ask the user for a file name
+  let fileName = prompt("Enter the file name (without extension):", "exam_data");
+  if (!fileName) return; // cancel if user closes prompt
+  fileName = fileName.trim() || "exam_data";
+  if (!fileName.toLowerCase().endsWith(".txt")) {
+    fileName += ".txt";
+  }
+
+  // Gather text from all panels
+  let fileContent = "";
+  panels.forEach((panel, idx) => {
+    const textareas = panel.querySelectorAll("textarea");
+    const question = textareas[0]?.value.trim() || "";
+    const options = textareas[1]?.value.trim() || "";
+    const answer = textareas[2]?.value.trim() || "";
+
+    fileContent += `* ${question}\n${options}\nanswer = ${answer}\n\n`;
+  });
+
+  // Create and trigger download
+  const blob = new Blob([fileContent], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadTextIntoPanels(text) {
+  const textboxArea = document.getElementById('textboxArea');
+  textboxArea.innerHTML = '';
+  counter = 0;
+
+  // Split file into question blocks
+  const blocks = text.split(/\n\s*\*/g)
+    .map(b => b.replace(/^\s*\*/, '').trim())
+    .filter(Boolean);
+
+  blocks.forEach(block => {
+    const lines = block.split(/\r?\n/).filter(l => l.trim() !== '');
+    const question = lines[0] || '';
+    let options = [];
+    let answer = '';
+
+    // ✅ Detect answer line even if it has spaces like "Answer = A"
+    lines.slice(1).forEach(line => {
+      const match = line.match(/^answer\s*=\s*(.*)$/i);
+      if (match) {
+        answer = match[1].trim();
+      } else {
+        options.push(line);
+      }
+    });
+
+    // ✅ Create new panel
+    addThreeTextboxes();
+
+    // ✅ Fill data into last panel
+    const panels = textboxArea.querySelectorAll('.small-panel');
+    const panel = panels[panels.length - 1];
+    const textareas = panel.querySelectorAll('textarea');
+
+    textareas[0].value = question;
+    textareas[1].value = options.join('\n');
+    textareas[2].value = answer;
+  });
+}
 </script>
 </body>
 </html>

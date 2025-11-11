@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<title>Exam Title</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      background: #f7f9fb;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color:#111;
+    }
+    header { 
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position: relative;
+      top: -30px;
+    }
+    #layout { 
+      display: none; /* hidden until file chosen */
+      margin-top:20px; 
+    }
+    .panel { 
+      background:white; 
+      padding:12px; 
+      border-radius:8px; 
+      box-shadow:0 1px 6px rgba(0,0,0,0.08) 
+    }
+    #exam .question { 
+      margin-bottom:12px; 
+    }
+    #exam[contenteditable="true"] {
+      outline: 2px dashed #007bff;
+      padding: 8px;
+      min-height: 100px;
+      cursor: text;
+    }
+    #exam[contenteditable="true"]:focus {
+      outline: 2px solid #1e6fff;
+      background-color: #f0f8ff;
+    }
+    label { 
+      cursor:pointer 
+    }
+    button { 
+      padding:8px 12px; 
+      border-radius:6px; 
+      border:0; 
+      background:#1e6fff; 
+      color:white; 
+      cursor:pointer 
+    }
+    button.secondary { 
+      background:#444; 
+      margin-left:8px 
+    }
+	  .question pre {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 4px 8px;
+      margin: 2px 0;
+      border-radius: 4px;
+      display: inline-block;
+      white-space: pre-wrap; /* keep line breaks and wrap long lines */
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .button-group {
+      display: none; /* required for margin:auto centering */
+      margin: 40px auto 0;
+      background: linear-gradient(90deg, #6aa3ff, #1ea3ff, #0fa0ff);
+      border-radius: 12px;
+      padding: 10px 40px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+      font-size: 16px;
+    }
+    .button-group:hover {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Edit Exam</h1>
+  </header>
+
+    <!-- File input moved just below the header -->
+  <div style="text-align:center; margin-top:-50px;">
+    <input type="file" id="fileInput" accept=".txt" style="margin-top:10px;">
+  </div>
+
+  <div id="layout">
+    <div id="content" class="panel" class="center-box">
+      <div id="exam" contenteditable="true"></div>
+
+      <button id="submitBtn" class="button-group">Save</button>
+      <button id="homeBtn" class="button-group" onclick="window.location.href='index.html'">Go Home</button>
+
+      <div id="result" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+   Exam parsing & rendering
+   ------------------------- */
+let answers = [];        // expected answers, in order
+let timeLeft = 60 * 60;   // default: 15 minutes, change before start
+let timerInterval = null;
+let recordingActive = false;
+let oneAtTime = true;
+let currentIndex = 0;
+
+document.getElementById('fileInput').addEventListener('change', handleFile);
+document.getElementById('submitBtn').addEventListener('click', submitExam);
+
+// Load questions
+function handleFile(ev){
+  const f = ev.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    parseQuestions(e.target.result);
+    
+    // ✅ show layout once file is loaded
+    document.getElementById('layout').style.display = 'grid';
+
+    // reveal all questions
+    document.querySelectorAll('#exam .question').forEach(q=> q.style.display = '');
+
+    // show buttons
+    document.getElementById('submitBtn').style.display = 'block'; // show
+    document.getElementById('homeBtn').style.display = 'block'; // show
+  }
+  r.readAsText(f);
+} 
+
+function parseQuestions(text){
+  // split by blocks that start with '*' (like your sample)  
+  const blocks = text
+  .split(/\n\s*\*/g)  // split only when * starts a new block
+  .map(b => b.replace(/^\s*\*/, "").trim())  // remove leading *
+  .filter(Boolean);
+  
+  answers = [];
+  const examDiv = document.getElementById('exam');
+  examDiv.innerHTML = '';
+  blocks.forEach((block, idx) => {
+    // split off "answer =" if present
+    const parts = block.split(/answer\s*=\s*/i);
+    const qPart = parts[0].trim();
+	const ans = parts[1]
+      ? parts[1].trim().split(",").map(a => a.trim().toLowerCase())
+      : [];
+    answers.push(ans);
+
+    const container = document.createElement('div');
+    container.className = 'question';
+    container.id = 'q' + idx;
+
+    // first non-empty line is question title
+    const lines = qPart.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const title = lines.shift() || `Question ${idx+1}`;
+    const h = document.createElement('h3');
+    h.textContent = `${idx+1}: ${title}`;
+    container.appendChild(h);
+
+	const correctAns = answers[idx];  // array of correct answers
+	const inputType = correctAns.length > 1 ? "checkbox" : "radio";
+
+	lines.forEach((line, i) => {
+      // options usually like "a. text"
+      const optMatch = line.match(/^([a-z])\.\s*(.*)$/);
+      if(optMatch){
+        const opt = optMatch[1].toLowerCase();
+		
+		// collect multi-line continuation
+		let optText = optMatch[2];
+		let j = i + 1;
+		while (j < lines.length && /^\s/.test(lines[j])) {
+		  optText += "\n" + lines[j];
+		  j++;
+		}
+		i = j - 1; // skip collected lines
+	
+		// escape before inserting
+		const safeText = escapeHtml(optText);
+  
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="${inputType}" name="q${idx}" value="${opt}"> ${optMatch[1]}. ${safeText}`;
+		container.appendChild(label);
+        container.appendChild(document.createElement('br'));
+      } else {
+        // non-option lines (extra) - show as text
+        const p = document.createElement('p');
+        p.textContent = line;
+        container.appendChild(p);
+      }
+    });
+
+    examDiv.appendChild(container);
+  });
+
+  // if oneAtTime default off, show all; otherwise show only first
+  if(oneAtTime) showQuestion(0);
+}
+
+document.querySelectorAll('#exam input').forEach(inp => {
+	  inp.disabled = false;   // make sure it’s enabled
+	  inp.checked = false;    // uncheck it
+	});
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* -------------------------
+   Grading / Submit
+   ------------------------- */
+function submitExam(){
+
+  const text = document.getElementById("exam").innerText; // get editable content
+  const blob = new Blob([text], { type: "text/plain" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "exam_content.txt";   // ✅ file name
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+/* -------------------------
+   One question at a time
+   ------------------------- */
+function toggleOneAtTime(){
+  oneAtTime = !oneAtTime;
+  const btn = document.getElementById('toggleOneAtTime');
+  const icon = btn.querySelector('i');
+
+  if(oneAtTime) {
+    btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+    showQuestion(0);
+  }
+  else {
+    // reveal all
+    btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+    document.querySelectorAll('#exam .question').forEach(q=> q.style.display = '');
+  }
+}
+
+function showQuestion(index){
+  const qs = document.querySelectorAll('#exam .question');
+  if(index < 0) index = 0;
+  if(index >= qs.length) index = qs.length - 1;
+  currentIndex = index;
+  qs.forEach((q,i) => q.style.display = (i===index ? '' : 'none'));
+}
+
+/* -------------------------
+   Camera + MediaRecorder
+   ------------------------- */
+let mediaStream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let snapshotTimer = null;
+
+const toggleRecordingBtn = document.getElementById('toggleRecording');
+</script>
+</body>
+</html>
