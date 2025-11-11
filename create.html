@@ -79,6 +79,7 @@
   /* Add button below the title */
   #addBoxBtn {
     position: fixed;
+    z-index: 9999;        /* ensure it's in front */
     bottom: 20px;
     right: 20px;
     background: #007bff;
@@ -96,6 +97,7 @@
 
   #saveAllBtn {
     position: fixed;
+    z-index: 9999;        /* ensure it's in front */
     bottom: 90px; /* places it right above addBoxBtn (which is at 20px) */
     right: 20px;
     background: #28a745;
