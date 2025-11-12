@@ -143,7 +143,7 @@
     <h1>Select Exam</h1>
     
     <label class="option">
-	    <input type="radio" name="choice" value="option1" checked> Offline (PC)
+	    <input type="radio" name="choice" value="option1" checked> Offline
     </label>
     <input type="file" id="fileInput" style="display:block" accept=".txt">
 
@@ -183,7 +183,9 @@
     fileInput.style.display = !radio2.checked ? 'block' : 'none';
   });
   */
+ /*
 function handleFile(ev){
+
   const f = ev.target.files[0];
   if(!f) return;
   const r = new FileReader();
@@ -194,7 +196,28 @@ function handleFile(ev){
     document.getElementById('start-btn').style.display = 'block'; // show
   }
   r.readAsText(f);
-}  
+}
+*/
+// Prueba: Leer archivo Online:
+async function handleFile() {
+  try {
+    // Path to your static file (same directory)
+    const response = await fetch('APX_exam.txt');
+    if (!response.ok) throw new Error('File not found or cannot be loaded');
+
+    const text = await response.text();
+
+    // Save file name and content to localStorage
+    localStorage.setItem("saveTitle", "APX_exam");
+    localStorage.setItem("saveContent", text);
+
+    // Show Start Exam button
+    document.getElementById('start-btn').style.display = 'block';
+  } catch (err) {
+    alert('Error reading exam file: ' + err.message);
+  }
+}
+
 </script>
 </body>
 </html>
