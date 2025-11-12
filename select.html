@@ -174,19 +174,19 @@
     <h1>Select Exam</h1>
     
     <label class="option">
-	    <input type="radio" name="choice" value="option1" checked> Offline
+	    <input type="radio" name="choice" value="option1"> Offline
     </label>
-    <input type="file" id="fileInput" style="display:block" accept=".txt">
+    <input type="file" id="fileInput" accept=".txt">
 
 	  <label class="option">
-      <input type="radio" name="choice" value="option2"> Online
+      <input type="radio" name="choice" value="option2" checked> Online
     </label>
 
-  <div class="select-container" id="selectContainer" style="display:none">
+  <div class="select-container" id="selectContainer" style="display:block">
     <select id="examSelect" onchange="handleExamSelect()">
       <option value="">-- Select Exam --</option>
-      <option value="APX_exam.txt">APX exam</option>
-      <option value="Desarrollo_Seguro.txt">Desarrollo Seguro</option>
+      <option value="APX exam.txt">APX exam</option>
+      <option value="Desarrollo Seguro.txt">Desarrollo Seguro</option>
     </select>
 
     <button id="downloadBtn" onclick="downloadExam()" title="Download exam">
@@ -205,7 +205,7 @@
   </div>
 
 <script>
-  document.getElementById('fileInput').style.display = 'block';
+  document.getElementById('fileInput').style.display = 'none';
 
   document.getElementById('fileInput').addEventListener('change', handleFile);
 
