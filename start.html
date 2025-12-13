@@ -465,6 +465,7 @@ let stream = null;
 let mediaRecorder = null;
 let recordedChunks = [];
 let snapshotTimer = null;
+let isCameraStarted = false;
 
 const video = document.getElementById('video');
 const toggleRecordingBtn = document.getElementById('toggleRecording');
@@ -494,6 +495,8 @@ async function startCamera(){
     // lazy-load TF and model after camera starts
     await loadModelIfNeeded();
     startDetectLoop();
+
+    isCameraStarted = true;
 
   } catch(e) {
     console.log('Camera error', e);
@@ -657,7 +660,126 @@ async function loadModelIfNeeded(){
   console.log('Model loaded');
 }
 
-/*************************************/
+/* -------------------------
+   Screen-switch-detection
+   ------------------------- */
+let violations = 0;
+const MAX_VIOLATIONS = 10;
+
+function log(msg) {
+    const t = new Date().toLocaleTimeString();
+    logBox.textContent += `[${t}] ${msg}\n`;
+}
+
+function addViolation(reason) {
+    violations++;
+    alert(`❌ Violation #${violations}: ${reason}`);
+    //log(`❌ Violation #${violations}: ${reason}`);
+
+    if (violations >= MAX_VIOLATIONS) {
+        alert("❌ Exam failed. Too many violations.");
+        // End exam
+    }
+}
+
+// Block Keyboard Shortcuts (as many as possible)
+document.addEventListener("keydown", (e) => {
+    const blockedCombos = [
+        e.ctrlKey && e.key === "t",
+        e.ctrlKey && e.key === "w",
+        e.ctrlKey && e.key === "n",
+        e.ctrlKey && e.key === "r",
+        e.key === "F11",
+        e.key === "F5",
+        e.key === "Escape",
+        //e.key === "F12", // Devtools
+    ];
+
+    if (blockedCombos.some(Boolean)) {
+        e.preventDefault();
+        addViolation(`Blocked shortcut: ${e.key}`);
+    }
+});
+
+/******/
+
+// Detect DevTools Opening (3 methods combined)
+// Method A — Size check
+/*
+setInterval(() => {
+  if(isCameraStarted) {
+    const threshold = 160;
+    if (window.outerWidth - window.innerWidth > threshold ||
+        window.outerHeight - window.innerHeight > threshold) {
+        addViolation("DevTools detected (resize)");
+    }
+  }
+}, 1000);
+*/
+// Method B — Debugger trap
+let check = false;
+setInterval(() => {
+  if(isCameraStarted) {
+    const start = Date.now();
+    if (Date.now() - start > 10) {
+        addViolation("DevTools detected (debugger slowdown)");
+    }
+  }
+}, 2000);
+
+// Method C — Console open check
+console.log("%cSTOP", "font-size: 100px; color: red;");
+
+/******/
+
+// Screen-switch detection (tab change + blur/focus)
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) addViolation("Tab switch or minimize");
+});
+/*
+window.addEventListener("blur", () => {
+    addViolation("Window lost focus (possible Alt+Tab)");
+});
+*/
+/******/
+
+// Detect leaving fullscreen
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) addViolation("Exited fullscreen");
+});
+
+/******/
+
+// Fake “Second Monitor Detection” (best possible)
+let originalWidth = window.screen.width;
+
+setInterval(() => {
+  if(isCameraStarted) {
+    if (window.screen.width !== originalWidth) {
+        addViolation("Possible second monitor usage");
+    }
+  }
+}, 3000);
+
+/******/
+
+
+// Virtual Desktop Detection (limited)
+/*
+let last = Date.now();
+setInterval(() => {
+  if(isCameraStarted) {
+    let now = Date.now();
+    if (now - last > 3000) {
+        addViolation("Virtual desktop or system switch detected");
+    }
+    last = now;
+  }
+}, 1000);
+*/
+
+/******/
+
 /*
 function createRecordingBlob(){
   const blob = new Blob(recordedChunks, { type: 'video/webm' });
