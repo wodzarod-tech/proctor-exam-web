@@ -1,482 +1,1041 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<title>Exam Title</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: Arial, sans-serif;
-    margin: 16px;
-    background: #f7f9fb;
-    color: #111;
-  }
+  <meta charset="utf-8" />
+  <title>Google Forms Clone – UI + Drag & Drop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  header {
-    display:flex;
-    flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
+  <!-- SortableJS -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
-  #layout {
-    display: none; /* hidden until file chosen */
-    margin-top:20px;
-  }
+  <style>
+    :root{
+      --purple:#2e7d32;
+      /*--purple:#673ab7;*/
+      --bg:#f1f3f4;
+      --card:#ffffff;
+      --border:#dadce0;
+      --text:#202124;
+    }
 
-  .panel {
-    background:white;
-    padding:12px;
-    border-radius:8px;
-    box-shadow:0 1px 6px rgba(0,0,0,0.08);
-  }
+    body{
+      margin:0;
+      font-family:Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-  /* small panel style used for generated groups too */
-  .small-panel {
-    background:white;
-    width: 100%;
-    max-width: 780px;
-    padding: 0; /* we'll handle padding in children so boxes join properly */
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-    overflow: hidden; /* keep rounded corners when children sit flush */
-    border: 1px solid rgba(0,0,0,0.06);
-  }
+    header{
+      background:var(--purple);
+      height:8px;
+    }
 
-  /* Joined textareas styling */
-  .joined-textareas {
-    display: flex;
-    flex-direction: column;
-  }
+    /* Form header total points */
+    .form-header-row{
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
 
-  .joined-textareas textarea {
-    width: 100%;
-	height: 100px;
-    min-height: 60px;
-    padding: 10px;
-    margin: 0;               /* removes default margins so they sit flush */
-    border: 0;               /* we'll use separators to mimic borders */
-    outline: none;
-    font-size: 14px;
-    resize: vertical;
-    background: #fff;
-  }
+    .total-points{
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-  /* create subtle separators between the textareas */
-  .joined-textareas textarea + textarea {
-    border-top: 1px solid #e6e6e6;
-  }
+      font-size: 14px;
+      color: #5f6368;
+      white-space: nowrap;
+    }
 
-  /* Add slight padding around the set so the group feels consistent */
-  .panel-inner {
-    padding: 10px;
-  }
+    .total-points strong{
+      font-size: 16px;
+      font-weight: 500;
+      color: #202124;
+    }
 
-    /* Add button below the title */
-  #addBoxBtn {
-    position: fixed;
-    z-index: 9999;        /* ensure it's in front */
-    bottom: 160px;
-    right: 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease;
-  }
-  #addBoxBtn:hover { 
-    transform: scale(1.1); 
-  }
+    .container{
+      max-width:820px;
+      margin:24px auto;
+    }
 
-  #saveAllBtn {
-    position: fixed;
-    z-index: 9999;        /* ensure it's in front */
-    bottom: 90px; /* places it right above addBoxBtn (which is at 20px) */
-    right: 20px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease;
-  }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-left: 4px solid transparent;
+      border-radius:8px;
+      padding:20px;
+      margin-bottom:16px;
+      position:relative;
+    }
 
-  #saveAllBtn:hover { 
-    transform: scale(1.1); 
-  }
+    .card.active{
+      border-left-color: #1a73e8; /* blue active question indicator */
+    }
+    .title-input{
+      font-size:32px;
+      border:none;
+      outline:none;
+      width:100%;
+      margin-bottom:8px;
+    }
 
-  #homeBtn {
-    position: fixed;
-    z-index: 9999;        /* ensure it's in front */
-    bottom: 20px; /* above the Load button */
-    right: 20px;
-    background: #0d6efd;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease, background 0.2s ease;
-  }
+    .desc-input{
+      border:none;
+      outline:none;
+      width:100%;
+      color:#5f6368;
+    }
 
-  #homeBtn:hover {
-    transform: scale(1.1);
-    background: #0b5ed7;
-  }
+    select{
+      padding:6px;
+      border:1px solid var(--border);
+      border-radius:4px;
+      margin-bottom:12px;
+    }
 
-  /* container for generated panels (outside the #layout) */
-  #textboxArea {
-    margin-top: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-  }
-  
-  /* ---------- Fake File Explorer Modal ---------- */
-  .modal-bg {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
+    .option{
+      position: relative;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
 
-  .modal-window {
-    background: #fff;
-    width: 450px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  }
+    .option input[type=text]{
+      flex:1;
+      /*border:none;
+      border-bottom:1px solid var(--border);*/
+      outline:none;
+    }
 
-  .modal-header {
-    background: linear-gradient(#0078d7, #005a9e);
-    color: white;
-    padding: 8px 12px;
-    font-size: 15px;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-  }
+    .q-title{
+      font-size:16px;
+      width:100%;
+      /*border:none;
+      border-bottom:1px solid var(--border);*/
+      outline:none;
+      margin-bottom:12px;
+      /* multiline */
+      resize: none;
+      overflow: hidden;
+      line-height: 1.4;
+    }
 
-  .modal-body {
-    padding: 16px;
-  }
+    /* Default: no visible bottom border */
+    .q-title,
+    .option input[type=text]{
+      border: none;
+      border-bottom: 1px solid transparent;
+    }
 
-  .modal-body label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
+    /* Show border ONLY when question card is active */
+    .card.active .q-title,
+    .card.active .option input[type=text]{
+      border-bottom-color: var(--border);
+    }
 
-  .modal-body input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #999;
-    border-radius: 4px;
-  }
+    /* Focus highlight ONLY inside active card */
+    .card.active .q-title:focus,
+    .card.active .option input[type=text]:focus{
+      border-bottom-color: #1a73e8;
+    }
 
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 12px 16px;
-    background: #f0f0f0;
-    border-top: 1px solid #ccc;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-  }
+    /* Default: hide borders & fade controls */
+    .q-type,
+    .card .btn-link{
+      opacity: 0;
+      pointer-events: none;
+    }
 
-  .modal-footer button {
-    padding: 6px 14px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid #888;
-  }
+    /* Active question: show controls */
+    .card.active .q-type,
+    .card.active .btn-link{
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-  .save-btn { background: #0078d7; color: white; border-color: #0078d7; }
-  .cancel-btn { background: #fff; }
-</style>
+    /* Smooth appearance */
+    .q-type,
+    .card .btn-link{
+      transition: opacity .15s ease;
+    }
+
+    /* Remove select border when inactive */
+    .q-type{
+      border-color: transparent;
+    }
+
+    /* Show select border only when active */
+    .card.active .q-type{
+      border-color: var(--border);
+    }
+
+    /* Focus highlight */
+    .card.active .q-type:focus{
+      border-color: #1a73e8;
+    }
+
+    /* select points for questions */
+    .question-header{
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .q-points{
+      margin-left: auto; /* pushes points to the right */
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #5f6368;
+      font-size: 13px;
+    }
+
+    .points-input{
+      width: 52px;
+      border: none;
+      border-bottom: 1px solid transparent;
+      text-align: right;
+      font-size: 13px;
+      color: #202124;
+      outline: none;
+    }
+
+    .points-input:focus{
+      border-bottom-color: #1a73e8;
+    }
+
+    .q-points span{
+      font-size: 13px;
+    }
+
+    /* option drag & drop */
+    .opt-drag{
+      /* Hidden by default */
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      
+      position: absolute;
+      left: -15px;          /* adjust if needed */
+      top: 50%;
+      transform: translateY(-50%);
+
+      cursor: grab;
+      color: #9aa0a6;
+      user-select: none;
+      font-size: 18px;
+      line-height: 1;
+      /*margin-right: 4px;*/
+    }
+
+    /* Visible only on active question */
+    .card.active .opt-drag{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .opt-icon{
+      accent-color: #5f6368; /* Google Forms gray */
+    }
+
+    .btn-link{
+      background:none;
+      border:none;
+      color:var(--purple);
+      cursor:pointer;
+      padding:4px 0;
+    }
+
+    .g-tooltip{
+      position: relative;
+    }
+
+    .g-tooltip::after{
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      /*bottom: 125%;*/
+      left: 50%;
+      transform: translateX(-50%);
+
+      background: #3c4043;
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      z-index: 1000;
+    }
+
+    .g-tooltip:hover::after,
+    .g-tooltip:focus-visible::after{
+      opacity: 1;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:12px;
+    }
+
+    /* Delete button */
+    .actions .btn-link{
+      font-size: 18px;
+      color: #5f6368;
+    }
+
+    .actions .btn-link:hover{
+      color: #d93025; /* Google red on delete */
+    }
+
+    .drag{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      width: 100%;
+      height: 24px;
+
+      margin: -8px 0 8px 0;   /* pull it slightly up like GForms */
+      cursor: grab;
+      user-select: none;
+
+      color: #9aa0a6;
+      font-size: 18px;
+      line-height: 4;
+    }
+
+    /* Required toggle */
+    .required-toggle{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #5f6368;
+    }
+
+    /* Switch */
+    .switch{
+      position: relative;
+      width: 36px;
+      height: 18px;
+    }
+
+    .switch input{
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider{
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #dadce0;
+      border-radius: 18px;
+      transition: 0.2s;
+    }
+
+    .slider:before{
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      top: 2px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .switch input:checked + .slider{
+      background-color: var(--purple); /* your green */
+    }
+
+    .switch input:checked + .slider:before{
+      transform: translateX(18px);
+    }
+
+    /*
+    .add-question{
+      width:100%;
+      padding:12px;
+      font-size:16px;
+      border:1px dashed var(--border);
+      background:white;
+      cursor:pointer;
+      border-radius:8px;
+    }*/
+
+    pre{
+      background:#111;
+      color:#0f0;
+      padding:12px;
+      font-size:12px;
+      overflow:auto;
+    }
+
+    /* Right toolbar */
+    /*
+    .gforms-toolbar{
+      position: fixed;
+      right: 24px;
+      top: 30px;
+
+      background: white;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      padding: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+
+      /* hide by default */
+      /*opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+    }
+
+    .gforms-toolbar button{
+      width: 40px;
+      height: 40px;
+
+      border: none;
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #5f6368;
+
+      border-radius: 50%;
+    }
+
+    .gforms-toolbar button:hover{
+      background: #f1f3f4;
+    }
+    */
+
+    /* Bottom toolbar */
+    .gforms-toolbar.bottom{
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      background: white;
+      border: 1px solid #dadce0;
+      border-bottom: none;
+
+      border-radius: 12px 12px 0 0;
+      padding: 8px 12px;
+
+      box-shadow: 0 -2px 6px rgba(0,0,0,.15);
+
+      transition: transform .25s ease;
+      z-index: 1000;
+    }
+
+    /* Hidden state */
+    .gforms-toolbar.bottom.hidden{
+      transform: translateX(-50%) translateY(100%);
+    }
+
+    .gforms-toolbar.collapsed{
+      transform: translateX(-50%) translateY(100%);
+    }
+
+    /* Buttons row */
+    .toolbar-buttons{
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Toolbar buttons */
+    .gforms-toolbar button{
+      width: 40px;
+      height: 40px;
+
+      border: none;
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #5f6368;
+      border-radius: 50%;
+    }
+
+    .gforms-toolbar button:hover{
+      background: #f1f3f4;
+    }
+
+    /* Handle */
+    .toolbar-handle{
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      width: 28px;
+      height: 28px;
+
+      border-radius: 50%;
+      /*background: white;
+      border: 1px solid #dadce0;*/
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 14px;
+      cursor: pointer;
+      color: #5f6368;
+
+      /*box-shadow: 0 1px 3px rgba(0,0,0,.2);*/
+    }
+
+    /* Section */
+    .section-label{
+      font-size: 13px;
+      color: #5f6368;
+      margin-bottom: 8px;
+    }
+
+    /* Feedback */
+    /* Feedback visibility like Google Forms */
+    .feedback{
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Default: no underline */
+    .feedback .q-title{
+      border-bottom-color: transparent;
+      transition: border-color .15s ease;
+    }
+
+    /* Active question: show underline */
+    .card.active .feedback .q-title{
+      border-bottom-color: var(--border);
+    }
+
+    /* Focus highlight */
+    .card.active .feedback .q-title:focus{
+      border-bottom-color: #1a73e8;
+    }
+
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Create Exam</h1>
-    <button id="addBoxBtn" title="Add question"><i class="fa fa-plus" aria-hidden="true"></i></button>
-	  <button id="saveAllBtn" title="Save">Save</button>
-    <button id="homeBtn" title="Home"><i class="fa fa-house"></i></button>
-  </header>
 
-  <div id="layout" style="margin-top:16px;">
-    <div id="content" class="panel">
-      <div id="exam" contenteditable="true"></div>
+<header></header>
 
-      <button id="submitBtn" class="button-group" style="display:none; margin-top:12px;">Save</button>
-      <button id="homeBtn" class="button-group" onclick="window.location.href='index.html'" style="display:none; margin-top:12px;">Go Home</button>
+<div class="container">
 
-      <div id="result" style="margin-top:12px"></div>
+  <!-- Form header -->
+<div class="card form-header">
+  <div class="form-header-row">
+    <div>
+      <input class="title-input" id="formTitle" placeholder="Title" />
+      <input class="desc-input" id="formDesc" placeholder="Form description" />
+    </div>
+
+    <div class="total-points">
+      <span>Total points</span>
+      <strong id="totalPoints">0</strong>
     </div>
   </div>
+</div>
 
-  <!-- Panels with groups of 3 textareas will appear here (outside layout) -->
-  <div id="textboxArea"></div>
+  <!-- Questions -->
+  <div id="questions"></div>
+
+  <!-- <button class="add-question" onclick="addQuestion()">+ Add question</button> -->
+
+  <!-- JSON view -->
+  <h3>Form JSON</h3>
+  <pre id="output"></pre>
+</div>
+
+<!-- Bottom toolbar -->
+<div id="gformsToolbar" class="gforms-toolbar bottom">
+  <!-- Handle -->
+  <div class="toolbar-handle g-tooltip" id="toolbarHandle" data-tooltip="Close panel" onclick="toggleToolbar()">▼</div>
+
+  <div class="toolbar-buttons">
+    <button class="g-tooltip" data-tooltip="Add question" onclick="addQuestion()">+</button>
+    <button class="g-tooltip" data-tooltip="Add section" onclick="addSection()">≡</button>
+    <button class="g-tooltip" data-tooltip="Export JSON" onclick="exportJSON()">⬇</button>
+    <button class="g-tooltip" data-tooltip="Import JSON" onclick="importJSON()">⬆</button>
+  </div>
+</div>
+
+<!-- hidden file input -->
+<input
+  type="file"
+  id="jsonFileInput"
+  accept="application/json"
+  hidden
+/>
 
 <script>
-/* -------------------------
-   Existing exam logic (kept functional)
-   ------------------------- */
-let answers = [];
-let oneAtTime = true;
-let currentIndex = 0;
-let counter = 0;
 
-document.getElementById('submitBtn').addEventListener('click', submitExam);
-document.getElementById('addBoxBtn').addEventListener('click', addThreeTextboxes);
-document.getElementById('saveAllBtn').addEventListener('click', saveAllTextboxes);
+// question must have its own radio group name
+let questionIdCounter = 0; // question ID
 
-document.getElementById('homeBtn').addEventListener('click', () => {
-  window.location.href = 'index.html';
+const questionsEl = document.getElementById('questions');
+const outputEl = document.getElementById('output');
+
+/***************************
+Header
+***************************/
+// Add total points calculation
+function updateTotalPoints(){
+  let total = 0;
+
+  document.querySelectorAll('.points-input').forEach(input => {
+    const val = parseFloat(input.value);
+    if (!isNaN(val)) total += val;
+  });
+
+  document.getElementById('totalPoints').textContent =
+    total % 1 === 0 ? total : total.toFixed(2);
+}
+
+/***************************
+Questions
+***************************/
+document.addEventListener('input', e => {
+  // Add question multiline
+  if(e.target.classList.contains('q-title')){
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+  }
+
+  updateJSON();
 });
 
-function parseQuestions(text){
-  const blocks = text.split(/\n\s*\*/g)
-    .map(b => b.replace(/^\s*\*/, "").trim())
-    .filter(Boolean);
+// Toggleable radios
+document.addEventListener('click', e => {
+  const radio = e.target;
 
-  answers = [];
-  const examDiv = document.getElementById('exam');
-  examDiv.innerHTML = '';
-  blocks.forEach((block, idx) => {
-    const parts = block.split(/answer\s*=\s*/i);
-    const qPart = parts[0].trim();
-    const ans = parts[1]
-      ? parts[1].trim().split(",").map(a => a.trim().toLowerCase())
-      : [];
-    answers.push(ans);
+  if (!radio.classList.contains('opt-icon')) return;
 
-    const container = document.createElement('div');
-    container.className = 'question';
-    container.id = 'q' + idx;
+  if (radio.type !== 'radio') return;
 
-    const lines = qPart.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    const title = lines.shift() || `Question ${idx+1}`;
-    const h = document.createElement('h3');
-    h.textContent = `${idx+1}: ${title}`;
-    container.appendChild(h);
+  // if it was already checked, uncheck it
+  if (radio.dataset.wasChecked === 'true') {
+    radio.checked = false;
+    radio.dataset.wasChecked = 'false';
+  } else {
+    // uncheck other radios in same group
+    document
+      .querySelectorAll(`input[type="radio"][name="${radio.name}"]`)
+      .forEach(r => r.dataset.wasChecked = 'false');
 
-    const inputType = ans.length > 1 ? "checkbox" : "radio";
+    radio.dataset.wasChecked = 'true';
+  }
 
-    lines.forEach((line) => {
-      const optMatch = line.match(/^([a-z])\.\s*(.*)$/);
-      if(optMatch){
-        const safeText = escapeHtml(optMatch[2]);
-        const label = document.createElement('label');
-        label.innerHTML = `<input type="${inputType}" name="q${idx}" value="${optMatch[1].toLowerCase()}"> ${optMatch[1]}. ${safeText}`;
-        container.appendChild(label);
-        container.appendChild(document.createElement('br'));
-      } else {
-        const p = document.createElement('p');
-        p.textContent = line;
-        container.appendChild(p);
-      }
+  updateJSON();
+});
+
+function addQuestion(){
+  const q = document.createElement('div');
+  q.className = 'card question';
+  q.dataset.qid = 'q_' + (++questionIdCounter); // ID question
+
+  q.innerHTML = `
+    <div class="drag">: : :</div>
+
+    <div class="question-header">
+
+      <div class="q-points">
+        <input type="number"
+          class="points-input"
+          min="0"
+          step="0.01"
+          placeholder="0"
+          oninput="limitDecimals(this); updateJSON()" />
+        <span>points</span>
+      </div>
+    </div>
+
+    <textarea class="q-title" placeholder="Question" rows="1"></textarea>
+
+    <select class="q-type" onchange="updateOptions(this)">
+      <option value="radio">◉ One choice</option>
+      <option value="checkbox">☑ Multiple choices</option>
+    </select>
+
+    <div class="options"></div>
+
+    <div>
+      <button class="btn-link" onclick="addOption(this)">Add option</button>
+    </div>
+
+    <div class="feedback">
+      <textarea class="q-title q-comment" id="comment" rows="1"
+        placeholder="Feedback for answer..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn-link g-tooltip"
+        data-tooltip="Duplicate"
+        onclick="duplicateQuestion(this)">
+        📄
+      </button>
+
+      <button class="btn-link g-tooltip"
+        data-tooltip="Delete question"
+        onclick="removeQuestion(this)">
+        🗑️
+      </button>
+
+      <div class="required-toggle">
+        <span>Required</span>
+        <label class="switch">
+          <input type="checkbox" class="q-required" onchange="updateJSON()">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  `;
+
+  questionsEl.appendChild(q);
+  addOption(q.querySelector('.btn-link'));
+  enableOptionDrag(q); // drag & drop per option
+  updateJSON();
+
+  // Auto-focus question text:
+  // when clicking Add question, then cursor automatically appears in the question text
+  setTimeout(() => {
+    q.querySelector('.q-title').focus();
+  }, 0);
+}
+
+function duplicateQuestion(btn){
+  const q = btn.closest('.question');
+  const clone = q.cloneNode(true);
+
+  // new question ID (important for radio groups)
+  clone.dataset.qid = 'q_' + (++questionIdCounter);
+
+  // fix radio group names
+  clone.querySelectorAll('.opt-icon[type="radio"]').forEach(radio => {
+    radio.name = clone.dataset.qid;
+  });
+
+  // remove active styles
+  clone.classList.remove('active');
+
+  // insert after original
+  q.after(clone);
+
+  // re-enable drag & drop for options
+  enableOptionDrag(clone);
+
+  updateJSON();
+}
+
+function removeQuestion(btn){
+  btn.closest('.question').remove();
+  updateJSON();
+  updateSectionNumbers();
+}
+
+// points: enforce max 2 decimals
+function limitDecimals(input){
+  const value = input.value;
+  if (!value.includes('.')) return;
+
+  const [int, dec] = value.split('.');
+  if (dec.length > 2){
+    input.value = `${int}.${dec.slice(0,2)}`;
+  }
+}
+ 
+function addOption(btn){
+  const q = btn.closest('.question');
+  const type = q.querySelector('.q-type').value;
+  const options = q.querySelector('.options');
+  const qid = q.dataset.qid; // ID question
+
+  const opt = document.createElement('div');
+  opt.className = 'option';
+
+  opt.innerHTML = `
+    <div class="opt-drag">⋮⋮</div>
+    <input class="opt-icon" type="${type}" ${type === 'radio' ? `name="${qid}" data-was-checked="false"` : ''} />
+    <input class="opt-text" type="text" />
+    <button class="btn-link g-tooltip" data-tooltip="Remove"
+      onclick="this.parentElement.remove(); updateJSON()">✕</button>
+  `;
+    // assign name to radio inputs when adding options
+
+  const optionNumber = getNextOptionNumber(q);
+  opt.querySelector('.opt-text').placeholder = `Option ${optionNumber}`; // option dynamic placeholder numbering
+
+  options.appendChild(opt);
+
+  enableOptionDrag(opt); // drag & drop per option
+
+  updateJSON();
+}
+
+function updateOptions(select){
+  const q = select.closest('.question');
+  const type = select.value;
+  const qid = q.dataset.qid; // ID question
+
+  q.querySelectorAll('.opt-icon').forEach(icon => {
+    icon.type = type;     // radio or checkbox
+    icon.checked = false;
+
+    if(type === 'radio'){
+      icon.name = qid;
+      icon.dataset.wasChecked = 'false'; // toggleable radios
+    } else {
+      icon.removeAttribute('name');
+      delete icon.dataset.wasChecked; // toggleable radios
+    }
+  });
+
+  updateJSON();
+}
+
+// Track option count per question
+function getNextOptionNumber(q){
+  return q.querySelectorAll('.opt-text').length + 1;
+}
+
+// enable drag & drop per options
+function enableOptionDrag(q){
+  const options = q.querySelector('.options');
+
+  if(!options || options._sortable)
+    return;
+
+  // drag starts only from .opt-drag
+  options._sortable = new Sortable(options, {
+    handle: '.opt-drag',
+    animation: 150,
+    filter: '.opt-icon, .opt-text, button',
+    preventOnFilter: false,
+    onEnd: updateJSON
+  });
+}
+
+/***************************
+Save in JSON for database
+***************************/
+function updateJSON(){
+  const form = {
+    title: formTitle.value,
+    description: formDesc.value,
+    questions: []
+  };
+
+  document.querySelectorAll('.question').forEach(q => {
+    form.questions.push({
+      text: q.querySelector('.q-title').value,
+      type: q.querySelector('.q-type').value,
+      required: q.querySelector('.q-required')?.checked || false,
+      options: [...q.querySelectorAll('.option')].map(opt => {
+        const textInput = opt.querySelector('.opt-text');
+        const control = opt.querySelector('.opt-icon');
+
+        return {
+          text: textInput.value || textInput.placeholder,
+          checked: control.checked
+        };
+      }),
+      comment: q.querySelector('#comment')?.value || ''
+    });
+  });
+
+  outputEl.textContent = JSON.stringify(form, null, 2);
+  updateTotalPoints();
+}
+
+// export JSON in a file
+function exportJSON(){
+  const data = outputEl.textContent;
+  if(!data) return;
+
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'form.json';
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// import JSON from file
+function importJSON(){
+  document.getElementById('jsonFileInput').click();
+}
+
+document.getElementById('jsonFileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      loadFormFromJSON(data);
+    }catch(err){
+      alert('Invalid JSON file');
+    }
+  };
+  reader.readAsText(file);
+
+  // reset input so same file can be re-imported
+  e.target.value = '';
+});
+
+// load JSON into editor
+function loadFormFromJSON(data){
+  // clear existing
+  questionsEl.innerHTML = '';
+  questionIdCounter = 0;
+
+  // header
+  formTitle.value = data.title || '';
+  formDesc.value = data.description || '';
+
+  // questions
+  data.questions?.forEach(qData => {
+    addQuestion();
+
+    const q = questionsEl.lastElementChild;
+    q.querySelector('.q-title').value = qData.text || '';
+    q.querySelector('.q-type').value = qData.type || 'radio';
+    updateOptions(q.querySelector('.q-type'));
+
+    // remove default option
+    q.querySelector('.options').innerHTML = '';
+
+    qData.options?.forEach(opt => {
+      addOption(q.querySelector('.btn-link'));
+      const lastOpt = q.querySelector('.options').lastElementChild;
+
+      lastOpt.querySelector('.opt-text').value = opt.text || '';
+      lastOpt.querySelector('.opt-icon').checked = !!opt.checked;
     });
 
-    examDiv.appendChild(container);
+    // feedback
+    if(qData.comment){
+      q.querySelector('#comment').value = qData.comment;
+    }
   });
 
-  if(oneAtTime) showQuestion(0);
+  updateJSON();
 }
 
-function escapeHtml(str) {
-  return String(str || '')
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+/***************************
+Right toolbar
+***************************/
+/*
+// toolbar appears only when a card is focused
+document.addEventListener('click', e => {
+  const card = e.target.closest('.card.question');
+  const toolbar = document.querySelector('.gforms-toolbar');
 
-function submitExam(){
-  const text = document.getElementById("exam").innerText;
-  const blob = new Blob([text], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "exam_content.txt";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function showQuestion(index){
-  const qs = document.querySelectorAll('#exam .question');
-  if(index < 0) index = 0;
-  if(index >= qs.length) index = qs.length - 1;
-  currentIndex = index;
-  qs.forEach((q,i) => q.style.display = (i===index ? '' : 'none'));
-}
-
-/* -------------------------
-   New: Add panel with 3 joined textareas (Question, Options, Answer)
-   The textareas are appended so they touch each other (no gap)
-   ------------------------- */
-function addThreeTextboxes() {
-  const textboxArea = document.getElementById('textboxArea');
-  const currentPanels = textboxArea.querySelectorAll('.small-panel').length;
-  counter = currentPanels + 1;
-
-  // panel wrapper (keeps consistent styling with other panels)
-  const panel = document.createElement('div');
-  panel.className = 'small-panel';
-  panel.style.position = 'relative'; // so the number badge and delete button can be placed inside
-
-  // container for number badge and delete button
-  const topControls = document.createElement('div');
-  //topControls.style.position = 'absolute';
-  //topControls.style.top = '-10px';
-  //topControls.style.left = '-10px';
-  topControls.style.display = 'flex';
-  topControls.style.alignItems = 'center';
-  topControls.style.gap = '6px';
-
-  // number badge
-  const numberLabel = document.createElement('div');
-  numberLabel.dataset.role = 'numberBadge';
-  numberLabel.textContent = `${counter}`;
-  Object.assign(numberLabel.style, {
-    backgroundColor: 'rgb(114,150,188)',
-    color: 'white',
-    width: '28px',
-    height: '28px',
-    //borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '14px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-  });
-
-  // delete button
-  const deleteBtn = document.createElement('button');
-  deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
-  Object.assign(deleteBtn.style, {
-    background: '#dc3545',
-    color: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '26px',
-    height: '26px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '14px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-  });
-
-  deleteBtn.addEventListener('click', () => {
-    panel.remove();
-    updatePanelNumbers(); // renumber after deletion
-  });
-
-  // add badge and delete button to the top controls
-  topControls.appendChild(numberLabel);
-  topControls.appendChild(deleteBtn);
-  panel.appendChild(topControls);
-
-  // inner padding for the joined textareas
-  const inner = document.createElement('div');
-  inner.className = 'panel-inner';
-
-  // container for the joined textareas
-  const joined = document.createElement('div');
-  joined.className = 'joined-textareas';
-
-  // placeholders in the requested order
-  const placeholders = ['Question', 'Options', 'Answer (ex: a,b)'];
-
-  placeholders.forEach(ph => {
-    const ta = document.createElement('textarea');
-    ta.placeholder = ph;
-    ta.setAttribute('aria-label', ph);
-    joined.appendChild(ta);
-  });
-
-  // assemble panel
-  inner.appendChild(joined);
-  panel.appendChild(inner);
-  textboxArea.appendChild(panel);
-
-  // focus the first textarea
-  const first = joined.querySelector('textarea');
-  if (first) first.focus();
-}
-
-/* Helper: Renumber all panels after one is deleted */
-function updatePanelNumbers() {
-  const panels = document.querySelectorAll('#textboxArea .small-panel');
-  panels.forEach((panel, idx) => {
-    const label = panel.querySelector('[data-role="numberBadge"]');
-    if (label) label.textContent = `${idx + 1}`;
-  });
-}
-
-function saveAllTextboxes() {
-  const panels = document.querySelectorAll('#textboxArea .small-panel');
-  if (panels.length === 0) {
-    alert("No panels to save!");
-    return;
+  if(card){
+    toolbar.style.opacity = '1';
+    toolbar.style.pointerEvents = 'auto';
+  } else {
+    toolbar.style.opacity = '0';
+    toolbar.style.pointerEvents = 'none';
   }
+});
+*/
 
-  // Ask the user for a file name
-  let fileName = prompt("Enter the file name (without extension):", "exam_data");
-  if (!fileName) return; // cancel if user closes prompt
-  fileName = fileName.trim() || "exam_data";
-  if (!fileName.toLowerCase().endsWith(".txt")) {
-    fileName += ".txt";
-  }
+/***************************
+Bottom toolbar
+***************************/
+function toggleToolbar(){
+  const toolbar = document.querySelector('.gforms-toolbar');
+  const handle = document.getElementById('toolbarHandle');
 
-  // Gather text from all panels
-  let fileContent = "";
-  panels.forEach((panel, idx) => {
-    const textareas = panel.querySelectorAll("textarea");
-    const question = textareas[0]?.value.trim() || "";
-    const options = textareas[1]?.value.trim() || "";
-    const answer = textareas[2]?.value.trim() || "";
+  toolbar.classList.toggle('collapsed');
 
-    fileContent += `* ${question}\n${options}\nanswer = ${answer}\n\n`;
-  });
+  const isCollapsed = toolbar.classList.contains('collapsed');
 
-  // Create and trigger download
-  const blob = new Blob([fileContent], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  URL.revokeObjectURL(url);
+  handle.textContent = isCollapsed ? '▲' : '▼';
+  handle.setAttribute(
+    'data-tooltip',
+    isCollapsed ? 'Open panel' : 'Close panel'
+  );
 }
+
+// toolbar: Blue active question indicator
+document.addEventListener('click', e => {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+
+  const card = e.target.closest('.card');
+
+  if(card)
+    card.classList.add('active');
+  else
+    document.activeElement.blur(); // zero cursor blinking when clicking outside
+});
+
+/***************************
+Section
+***************************/
+function addSection(){
+  const section = document.createElement('div');
+  section.className = 'card';
+  section.innerHTML = `
+    <div class="section-label"></div>
+    <input class="title-input" placeholder="Section title" />
+    <input class="desc-input" placeholder="Section description" />
+  `;
+  questionsEl.appendChild(section);
+  updateJSON();
+  updateSectionNumbers();
+}
+
+// auto numbering
+function updateSectionNumbers(){
+  const sections = document.querySelectorAll('.section-label');
+  sections.forEach((s, i) => {
+    s.textContent = `Section ${i + 1} of ${sections.length}`;
+  });
+}
+
+/***************************
+Initialization
+***************************/
+new Sortable(questionsEl, {
+  handle: '.drag',
+  animation: 150,
+  onEnd: updateJSON
+});
+
+addQuestion();
 </script>
+
 </body>
 </html>
