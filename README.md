@@ -46,3 +46,20 @@ Settings
 
 function handleImport(){
   
+/***************************
+Import panel
+***************************/
+async function handleImport(){
+
+  /* -------------------------
+   Exam parsing & rendering
+   ------------------------- */
+let answers = [];        // expected answers, in order
+
+let recordingActive = false;
+let oneAtTime = true;
+let currentIndex = 0;
+
+Violation #2: Tab switch or minimize
+
+Screen-switch-detection
