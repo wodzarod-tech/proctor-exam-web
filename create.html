@@ -120,6 +120,13 @@
       resize: none;
       overflow: hidden;
       line-height: 1.4;
+      caret-color: transparent;
+    }
+
+    /* Show caret only when question card is active */
+    .question.active .q-title,
+    .q-title:focus {
+      caret-color: auto;
     }
 
     /* Default: no visible bottom border */
@@ -319,6 +326,16 @@
       gap: 8px;
       font-size: 13px;
       color: #5f6368;
+      /* Hide Required toggle by default */
+      pointer-events: none;
+      /*transition: opacity .15s ease;*/
+      visibility: hidden;
+    }
+
+    /* Show ONLY when question card is active */
+    .card.active .required-toggle{
+      pointer-events: auto;
+      visibility: visible;
     }
 
     /* Switch */
@@ -913,7 +930,7 @@ function addQuestion(){
 
     <div class="feedback">
       <textarea class="q-title q-comment" id="comment" rows="1"
-        placeholder="Feedback for answer..."></textarea>
+        placeholder="Feedback"></textarea>
     </div>
 
     <div class="actions">
@@ -946,9 +963,9 @@ function addQuestion(){
 
   // Auto-focus question text:
   // when clicking Add question, then cursor automatically appears in the question text
-  setTimeout(() => {
+  /*setTimeout(() => {
     q.querySelector('.q-title').focus();
-  }, 0);
+  }, 0);*/
 }
 
 function duplicateQuestion(btn){
