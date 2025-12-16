@@ -774,14 +774,104 @@
       100%{ transform: scale(1.15); opacity: .6; }
     }
 
+    /* Import panel */
+    .upload-card{
+      width:420px;
+      background:#fff;
+      border-radius:12px;
+      padding:20px 20px 60px; /* extra bottom space */
+      box-shadow:0 8px 30px rgba(0,0,0,.15);
+      font-family:Arial, sans-serif;
+      position: relative; /* 🔑 needed */
+    }
+
+    .upload-card h3{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .dropzone{
+      border:2px dashed #3b82f6;
+      border-radius:10px;
+      padding:40px 20px;
+      text-align:center;
+      background:#f8fbff;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .dropzone.dragover{
+      background:#eef5ff;
+    }
+
+    .cloud{
+      font-size:42px;
+      margin-bottom:10px;
+    }
+
+    .dropzone p{
+      margin:0;
+      font-size:14px;
+      color:#555;
+    }
+
+    .browse{
+      color:#2563eb;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .formats{
+      font-size:12px;
+      color:#666;
+      margin:12px 0 16px;
+    }
+
+    .upload-btn{
+      position:absolute;
+      bottom:16px;
+      right:20px;
+      background:#2563eb;
+      color:#fff;
+      border:none;
+      padding:10px 18px;
+      border-radius:6px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .upload-btn:hover{
+      background:#1d4ed8;
+    }
+
   </style>
 </head>
 <body>
-
+<!--
 <div id="startScreen" class="start-screen">
   <button class="start-import-btn" onclick="importJSON()">
     📂 Import exam
   </button>
+</div>
+-->
+<!-- Import panel -->
+<div id="importDropzone" class="upload-card">
+  <h3>Upload file</h3>
+
+  <div class="dropzone" id="dropzone">
+    <div class="cloud">☁️</div>
+    <p>
+      Drag & Drop your file or
+      <span class="browse" onclick="fileInput.click()">Browse</span>
+    </p>
+    <input type="file" id="fileInput" accept=".json" hidden />
+  </div>
+
+  <p class="formats">
+    Supported format: <b>JSON</b> &nbsp; Maximum size: <b>5MB</b>
+  </p>
+
+  <button class="upload-btn" onclick="handleImport()">Start Exam</button>
 </div>
 
 <!-- Countdown modal -->
@@ -832,7 +922,7 @@
     <div class="toolbar-buttons">
       <button class="g-tooltip" data-tooltip="Add question" onclick="addQuestion()">+</button>
       <button class="g-tooltip" data-tooltip="Add section" onclick="addSection()">≡</button>
-          <button class="g-tooltip" data-tooltip="Import JSON" onclick="importJSON()">📂</button>
+      <button class="g-tooltip" data-tooltip="Import JSON" onclick="importJSON()">📂</button>
       <button class="g-tooltip" data-tooltip="Export JSON" onclick="exportJSON()">💾</button>
       <button  class="g-tooltip" data-tooltip="Proctor settings" onclick="openProctorConfig()">🛡️</button>
       <button class="g-tooltip" data-tooltip="Home" onclick="window.location.href='index.html'">🏠</button>
@@ -957,6 +1047,62 @@ let questionIdCounter = 0; // question ID
 
 const questionsEl = document.getElementById('questions');
 const outputEl = document.getElementById('output');
+
+/***************************
+Import panel
+***************************/
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+let importedFile = null;
+
+dropzone.onclick = () => fileInput.click();
+
+dropzone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropzone.classList.add('dragover');
+});
+
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('dragover');
+});
+
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  importedFile = e.dataTransfer.files[0];
+});
+
+fileInput.onchange = e => {
+  importedFile = e.target.files[0];
+};
+
+function handleImport(){
+  if(!importedFile){
+    alert("Please select a JSON file");
+    return;
+  }
+
+  if(!importedFile.name.endsWith(".json")){
+    alert("Only JSON files allowed");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const json = JSON.parse(reader.result);
+
+    // Show Editor, Hide Import modal
+    document.getElementById('importDropzone').style.display = 'none';
+
+    // Countdown modal
+    showStartExamModal(() => {
+      document.getElementById('editorApp').style.display = 'block';
+    });
+
+    loadFormFromJSON(json);
+  };
+  reader.readAsText(importedFile);
+}
 
 /***************************
 Header
@@ -1335,10 +1481,8 @@ function exportJSON(){
 }
 
 // import JSON from file
-function importJSON(){
+/*function importJSON(){
   document.getElementById('jsonFileInput').click();
-
-
 }
 
 document.getElementById('jsonFileInput').addEventListener('change', e => {
@@ -1368,6 +1512,7 @@ document.getElementById('jsonFileInput').addEventListener('change', e => {
   // reset input so same file can be re-imported
   e.target.value = '';
 });
+*/
 
 // load JSON into editor
 function loadFormFromJSON(data){
