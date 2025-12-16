@@ -790,6 +790,14 @@
       font-size:18px;
     }
 
+    #importDropzone {
+      position: fixed;   /* overlay on entire screen */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;    /* above other content */
+    }
+
     .dropzone{
       border:2px dashed #3b82f6;
       border-radius:10px;
@@ -798,6 +806,19 @@
       background:#f8fbff;
       cursor:pointer;
       transition:.2s;
+    }
+
+    /* Style when a file is uploaded */
+    .dropzone.uploaded {
+      background: #e0f7e9;  /* light green */
+      border-color: #10b981; /* green border */
+    }
+
+    .dropzone .file-name {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #065f46; /* dark green */
+      font-weight: 500;
     }
 
     .dropzone.dragover{
@@ -1070,10 +1091,36 @@ dropzone.addEventListener('drop', e => {
   e.preventDefault();
   dropzone.classList.remove('dragover');
   importedFile = e.dataTransfer.files[0];
+
+  if(importedFile){
+    // show uploaded state
+    dropzone.classList.add('uploaded');
+
+    // remove previous file name if exists
+    const existing = dropzone.querySelector('.file-name');
+    if(existing) existing.remove();
+
+    // show file name
+    const nameEl = document.createElement('div');
+    nameEl.className = 'file-name';
+    nameEl.textContent = importedFile.name;
+    dropzone.appendChild(nameEl);
+  }
 });
 
 fileInput.onchange = e => {
   importedFile = e.target.files[0];
+  if(importedFile){
+    dropzone.classList.add('uploaded');
+
+    const existing = dropzone.querySelector('.file-name');
+    if(existing) existing.remove();
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'file-name';
+    nameEl.textContent = importedFile.name;
+    dropzone.appendChild(nameEl);
+  }
 };
 
 function handleImport(){
