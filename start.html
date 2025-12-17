@@ -906,6 +906,14 @@
       background: #000 
     }
 
+    .view-toggle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:#5f6368;
+    }
+
   </style>
 </head>
 <body>
@@ -972,13 +980,31 @@
         <span>Total points</span>
         <strong id="totalPoints">0</strong>
       </div>
+
+      <div class="view-toggle">
+        <span>View:</span>
+
+        <label class="switch">
+          <input type="checkbox" id="oneByOneToggle" onchange="toggleQuestionView(this)">
+          <span class="slider"></span>
+        </label>
+
+        <span>One by one</span>
+      </div>
     </div>
+
   </div>
 
     <!-- Questions -->
     <div id="questions"></div>
 
     <!-- <button class="add-question" onclick="addQuestion()">+ Add question</button> -->
+
+    <!-- Navigation Buttons -->
+    <div id="questionNav" style="display:none; text-align:center; margin:20px 0">
+      <button onclick="prevQuestion()">⬅ Previous</button>
+      <button onclick="nextQuestion()">Next ➡</button>
+    </div>
 
     <!-- JSON view -->
     <div style="display:none">
@@ -1226,7 +1252,7 @@ async function handleImport(){
       addQuestion();
       startTimer();
 
-      screenSwitchdetection();
+      //screenSwitchdetection();
     });
 
   } catch(err) {
@@ -1498,6 +1524,56 @@ function enableOptionDrag(q){
 }
 
 /***************************
+Navigation Buttons Next / Previous
+***************************/
+let oneByOneMode = false;
+let currentQuestionIndex = 0;
+
+function toggleQuestionView(toggle){
+  oneByOneMode = toggle.checked;
+  currentQuestionIndex = 0;
+
+  if(oneByOneMode){
+    showOnlyQuestion(currentQuestionIndex);
+    document.getElementById('questionNav').style.display = 'block';
+  }else{
+    showAllQuestions();
+    document.getElementById('questionNav').style.display = 'none';
+  }
+}
+
+function showOnlyQuestion(index){
+  const questions = document.querySelectorAll('.question');
+
+  questions.forEach((q, i) => {
+    q.style.display = i === index ? 'block' : 'none';
+    //q.classList.toggle('active', i === index);
+  });
+}
+
+function showAllQuestions(){
+  document.querySelectorAll('.question').forEach(q => {
+    q.style.display = 'block';
+    q.classList.remove('active');
+  });
+}
+
+function nextQuestion(){
+  const questions = document.querySelectorAll('.question');
+  if(currentQuestionIndex < questions.length - 1){
+    currentQuestionIndex++;
+    showOnlyQuestion(currentQuestionIndex);
+  }
+}
+
+function prevQuestion(){
+  if(currentQuestionIndex > 0){
+    currentQuestionIndex--;
+    showOnlyQuestion(currentQuestionIndex);
+  }
+}
+
+/***************************
 Proctor configuration
 ***************************/
 function openProctorConfig(){
@@ -1697,6 +1773,12 @@ function loadFormFromJSON(data){
       q.querySelector('#comment').value = qData.comment;
     }
   });
+
+  // reset view mode after loading
+  document.getElementById('oneByOneToggle').checked = false;
+  oneByOneMode = false;
+  showAllQuestions();
+  document.getElementById('questionNav').style.display = 'none';
 
   updateJSON();
 }

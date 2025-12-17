@@ -36,6 +36,7 @@ Proctor Exam Web
    8.2. Screen-switch-detection
    8.3. Noise-detection
    8.4. Eye-tracking
+9. Show all questions/One question at a time (exam mode / paginated)
 
 Others: “Google Forms + Proctor exam system
 Preview mode (student view)
