@@ -1433,9 +1433,16 @@ function updateJSON(){
   };
 
   document.querySelectorAll('.question').forEach(q => {
+
+    // points in JSON
+    const pointsInput = q.querySelector('.points-input');
+    const points = parseFloat(pointsInput?.value) || 0;
+
+    // build JSON
     form.questions.push({
       text: q.querySelector('.q-title').value,
       type: q.querySelector('.q-type').value,
+      points: points,
       required: q.querySelector('.q-required')?.checked || false,
       options: [...q.querySelectorAll('.option')].map(opt => {
         const textInput = opt.querySelector('.opt-text');
@@ -1504,6 +1511,7 @@ function loadFormFromJSON(data){
     const q = questionsEl.lastElementChild;
     q.querySelector('.q-title').value = qData.text || '';
     q.querySelector('.q-type').value = qData.type || 'radio';
+    q.querySelector('.points-input').value = qData.points ?? 0;
     updateOptions(q.querySelector('.q-type'));
 
     // remove default option
@@ -2107,7 +2115,7 @@ window.onload = async function() {
     
     // Load questions
     loadFormFromJSON(data);
-    addQuestion();
+    //addQuestion();
     startTimer();
 
     //screenSwitchdetection();

@@ -139,6 +139,23 @@ Auto-grade
 window.onload = async function() {
 function addOption(btn)
 
+---
+      <div class="q-points">
+        <input type="number"
+          class="points-input"
+          min="0"
+          step="0.01"
+          placeholder="0"
+          oninput="limitDecimals(this); updateJSON()" />
+        <span>points</span>
+      </div>
+
+
+--
+function submitExam(){
+
+gradeExamFromJSON()
+
 
 
 
