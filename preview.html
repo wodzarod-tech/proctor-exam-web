@@ -712,9 +712,39 @@
       display:flex;
       align-items:center;
       gap:8px;
-      
+
       font-size:13px;
       color:#5f6368;
+    }
+
+    /* Previous / Next / Submit buttons */
+    .question-nav{
+      position: relative;
+      display: flex;
+      justify-content: center; /* center Prev + Next */
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .nav-center{
+      display: flex;
+      gap: 10px;
+    }
+
+    #submitBtn{
+      position: absolute;
+      right: 0;
+
+      background: var(--purple);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 18px;
+      cursor: pointer;
+    }
+
+    #submitBtn:hover{
+      opacity: 0.9;
     }
 
   </style>
@@ -773,9 +803,13 @@
     <div id="questions"></div>
 
     <!-- Navigation Buttons -->
-    <div id="questionNav" style="display:none; text-align:center; margin:20px 0">
-      <button onclick="prevQuestion()">⬅ Previous</button>
-      <button onclick="nextQuestion()">Next ➡</button>
+    <div id="questionNav" class="question-nav" style="display:none;">
+      <div id="navCenter" class="nav-center">
+        <button id="prevBtn" onclick="prevQuestion()">⬅ Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()">Next ➡</button>
+      </div>
+
+      <button id="submitBtn" onclick="submitExam()">Submit</button>
     </div>
   </div>
 
@@ -1160,7 +1194,7 @@ function enableOptionDrag(q){
 }
 
 /***************************
-Navigation Buttons Next / Previous
+Navigation Buttons Next / Previous / Submit
 ***************************/
 let oneByOneMode = false;
 let currentQuestionIndex = 0;
@@ -1171,11 +1205,16 @@ function toggleQuestionView(toggle){
 
   if(oneByOneMode){
     showOnlyQuestion(currentQuestionIndex);
+    document.getElementById('navCenter').style.display = 'block';
     document.getElementById('questionNav').style.display = 'block';
+    updateNavButtons();
   }else{
     showAllQuestions();
-    document.getElementById('questionNav').style.display = 'none';
+    document.getElementById('navCenter').style.display = 'none';
+    document.getElementById('questionNav').style.display = 'block';
   }
+
+  updateSubmitVisibility();
 }
 
 function showOnlyQuestion(index){
@@ -1189,16 +1228,20 @@ function showOnlyQuestion(index){
 
 function showAllQuestions(){
   document.querySelectorAll('.question').forEach(q => {
-    q.style.display = 'block';
-    q.classList.remove('active');
+    q.style.display = '';
+    //q.classList.remove('active');
   });
+
+  updateSubmitVisibility();
 }
 
 function nextQuestion(){
   const questions = document.querySelectorAll('.question');
+
   if(currentQuestionIndex < questions.length - 1){
     currentQuestionIndex++;
     showOnlyQuestion(currentQuestionIndex);
+    updateNavButtons();
   }
 }
 
@@ -1206,7 +1249,77 @@ function prevQuestion(){
   if(currentQuestionIndex > 0){
     currentQuestionIndex--;
     showOnlyQuestion(currentQuestionIndex);
+    updateNavButtons();
   }
+}
+
+// control button states
+function updateNavButtons() {
+  const questions = document.querySelectorAll('.question');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Disable Previous on first question
+  prevBtn.disabled = currentQuestionIndex === 0;
+
+  // Disable Next on last question
+  nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+
+  // Show Submit ONLY on last question
+  submitBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+}
+
+function updateSubmitVisibility() {
+  const submitBtn = document.getElementById('submitBtn');
+  const questions = document.querySelectorAll('.question');
+
+  if (!oneByOneMode) {
+    // Show-all mode → always show Submit
+    submitBtn.style.display = 'inline-block';
+
+    document.getElementById('navCenter').style.display = 'none';
+    document.getElementById('questionNav').style.display = 'block';
+
+    return;
+  }
+
+  // One-by-one mode → only on last question
+  submitBtn.style.display =
+    currentQuestionIndex === questions.length - 1
+      ? 'inline-block'
+      : 'none';
+}
+
+// submit exam
+// Protect manual Submit (no double submit)
+let examSubmitted = false;
+
+function submitExam(){
+  if (examSubmitted) return;
+  
+  examSubmitted = true;
+
+  clearInterval(timerInterval);
+
+  // 👉 collect answers here
+  console.log("Exam submitted");
+  alert("Exam submitted!");
+
+  // collect answers here
+  // redirect / show results / save to Firebase
+}
+
+// Auto-submit when the timer ends
+// Auto-submits when time = 0
+// Prevents double submit
+function autoSubmitExam(){
+  if (examSubmitted) return;
+
+  examSubmitted = true;
+  alert("⏱ Time is up! Exam submitted automatically.");
+
+  submitExam(); // 👈 your existing submit logic
 }
 
 /***************************
@@ -1322,9 +1435,7 @@ function getProctorSettings(){
 
 // load JSON into editor
 function loadFormFromJSON(data){
-  debugger;
-  let a = data.title;
-  console.log("test = ", a);
+
   // clear existing
   questionsEl.innerHTML = '';
   questionIdCounter = 0;
@@ -1364,7 +1475,7 @@ function loadFormFromJSON(data){
   document.getElementById('oneByOneToggle').checked = false;
   oneByOneMode = false;
   showAllQuestions();
-  document.getElementById('questionNav').style.display = 'none';
+  //document.getElementById('questionNav').style.display = 'none';
 
   updateJSON();
 }
@@ -1414,18 +1525,22 @@ function updateSectionNumbers(){
 /***************************
 Timer
 ***************************/
-let timeLeft = 60 * 60;   // default: 15 minutes, change before start
+//let timeLeft = 60 * 60;   // default: 15 minutes, change before start
+let timeLeft = 3; // pruebas
 let timerInterval = null;
 
 function startTimer(){
   // you can set timeLeft before startingExam if desired
   updateTimerDisplay();
+
   timerInterval = setInterval(() => {
     timeLeft--;
+
     updateTimerDisplay();
+
     if(timeLeft <= 0){
       clearInterval(timerInterval);
-      submitExam();
+      autoSubmitExam();
     }
   }, 1000);
 }

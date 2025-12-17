@@ -45,6 +45,22 @@ Proctoring hooks (camera / mic / tab focus)
 Settings
   Show One question/All questions
 
+  📊 Auto-grade on submit
+
+🔐 Lock exam after submit
+
+⏱ Auto-submit when timer ends
+
+Disable Submit until all required answered
+
+📤 Send answers to Firebase
+
+⚠ Turn timer red at last 60s
+
+
+
+***********************************************
+
 function handleImport(){
   
 /***************************
@@ -101,4 +117,30 @@ updateJSON
   formDesc.value = data.description || '';
   JSON.stringify
   JSON.parse
+
+updateSubmitVisibility
+
+showAllQuestions
+toggle.checked
+
+submitBtn.style.display = 'inline-block';
+    document.getElementById('questionNav').style.display = 'block';
+
+<div id="timer">Time Left: --:--</div>
+
+
+
+<div id="examTimer" class="exam-timer">
+  ⏱ <span id="timeLeft">00:00</span>
+</div>
+
+function startTimer(){
+
+
+
+
+
+
+
   
+this is the final boss feature.
