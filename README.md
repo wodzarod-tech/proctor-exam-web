@@ -177,6 +177,6 @@ let examData = null;
     */
   //
 
-
+<textarea class="q-title" placeholder="Question" rows="1"></textarea>
 
 this is the final boss feature.
