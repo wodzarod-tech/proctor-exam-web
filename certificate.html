@@ -25,6 +25,39 @@
       box-shadow:0 8px 24px rgba(0,0,0,.2);
     }
 
+    /* Force ONE-PAGE PDF */
+    @media print {
+    body{
+        background: white;
+        height: auto;
+    }
+
+    .certificate{
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        height: auto;
+        padding: 40px;
+    }
+
+    /* Remove “⬇ Download as PDF” from the PDF */
+    .actions{
+      display: none;
+    }
+
+    /* signature */
+    .signature img{
+      max-width:140px;
+    }
+
+    @page{
+        size: A4;
+        margin: 12mm;
+    }
+    }
+
     h1{
       color:#2e7d32;
       font-size:36px;
@@ -74,6 +107,23 @@
       align-items: center;
     }
 
+    /* signature */
+    .signature{
+      text-align:center;
+    }
+
+    .signature img{
+      width:140px;
+      height:auto;
+      margin-bottom:4px;
+    }
+
+    .sig-name{
+      font-size:13px;
+      border-top:1px solid #999;
+      padding-top:4px;
+    }
+
   </style>
 </head>
 <body>
@@ -90,8 +140,15 @@
   <div class="score" id="examScore"></div>
 
   <div class="footer">
-    <div>Date: <span id="date"></span></div>
-    <div>Authorized Signature</div>
+    <div>
+        Date:<br>
+        <strong id="date"></strong>
+    </div>
+
+    <div class="signature">
+        <img src="assets/signature.png" alt="Signature">
+        <div class="sig-name">Authorized Signature</div>
+    </div>
   </div>
 
   <p style="margin-top:12px;font-size:14px;color:#555">

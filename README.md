@@ -61,7 +61,7 @@ Disable Submit until all required answered
 
 🏫 Institution logo & signatures
 
-
+🖋 Digital signature image
 
 
 
