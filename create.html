@@ -919,6 +919,22 @@ document.addEventListener('input', e => {
   updateJSON();
 });
 
+// Auto-save while editing
+// Saves after typing stops
+let autosaveTimer;
+
+document.addEventListener('input', () => {
+  clearTimeout(autosaveTimer);
+
+  const data = outputEl.textContent;
+  if(!data) return;
+
+  autosaveTimer = setTimeout(() => {
+    debugger;
+    localStorage.setItem('formContent',data);
+  }, 500);
+});
+
 // Toggleable radios
 document.addEventListener('click', e => {
   const radio = e.target;
@@ -1494,13 +1510,30 @@ function updateSectionNumbers(){
 /***************************
 Initialization
 ***************************/
-new Sortable(questionsEl, {
-  handle: '.drag',
-  animation: 150,
-  onEnd: updateJSON
-});
+window.onload = async function() {
+  // Restore Auto-save while editing
+  // Restore go back button from Preview
+  // Read JSON file (awaitable)
+  const json = localStorage.getItem("formContent");
+  
+  if(json) {
+    examData = JSON.parse(json);
+  
+    // Load questions
+    loadFormFromJSON(examData);
+  } else {
+    new Sortable(questionsEl, {
+      handle: '.drag',
+      animation: 150,
+      onEnd: updateJSON
+    });
 
-addQuestion();
+    addQuestion();
+  }
+}
+
+
+
 </script>
 
 </body>

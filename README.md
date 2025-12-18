@@ -38,6 +38,7 @@ Proctor Exam Web
    8.4. Eye-tracking
 9. Show all questions/One question at a time (exam mode / paginated)
 10. Do options multiline
+11. Auto-save while editing
 
 Others: “Google Forms + Proctor exam system
 Preview mode (student view)
@@ -67,6 +68,14 @@ Disable Submit until all required answered
 
 
 ***********************************************
+
+function exportJSON(){
+  const data = outputEl.textContent;
+  if(!data) return;
+
+examDraft
+
+
 
 function handleImport(){
   
@@ -182,5 +191,12 @@ do multiulne when I write an option, exactly like when I write question
  <input class="opt-text" type="text" placeholder="Option 1">
 
 <textarea class="q-title" placeholder="Question" rows="1"></textarea>
+
+  localStorage.setItem('formContent', data);
+
+
+
+
+
 
 this is the final boss feature.
