@@ -176,6 +176,10 @@ let examData = null;
     <input type="radio" data-option-index="1">
     */
   //
+  // auto-resize: add question/option multiline
+
+do multiulne when I write an option, exactly like when I write question
+ <input class="opt-text" type="text" placeholder="Option 1">
 
 <textarea class="q-title" placeholder="Question" rows="1"></textarea>
 

@@ -107,6 +107,19 @@
       margin-bottom:8px;
       user-select: none;
     }
+  
+    /* option multiline: textarea look like input */
+    .option .opt-text{
+      width: 100%;
+      resize: none;
+      overflow: hidden;
+      line-height: 1.4;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      border: none;
+      outline: none;
+    }
 
     .option input[type=text]{
       flex:1;
@@ -1022,7 +1035,8 @@ Questions
 ***************************/
 document.addEventListener('input', e => {
   // Add question multiline
-  if(e.target.classList.contains('q-title')){
+  if(e.target.classList.contains('q-title')||
+    e.target.classList.contains('opt-text')){
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   }
@@ -1182,7 +1196,7 @@ function addOption(btn){
   opt.innerHTML = `
     <div class="opt-drag">⋮⋮</div>
     <input class="opt-icon" type="${type}" ${type === 'radio' ? `name="${qid}" data-was-checked="false"` : ''} />
-    <input class="opt-text" type="text" />
+    <textarea class="opt-text" rows="1"></textarea>
     <button class="btn-link g-tooltip" data-tooltip="Remove"
       onclick="this.parentElement.remove(); updateJSON()">✕</button>
   `;
@@ -1248,6 +1262,13 @@ function enableOptionDrag(q){
     preventOnFilter: false,
     onEnd: updateJSON
   });
+}
+
+// auto-resize textareas when import JSON file
+function autoResizeTextarea(el){
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 /***************************
@@ -1518,7 +1539,12 @@ function loadFormFromJSON(data){
     addQuestion();
 
     const q = questionsEl.lastElementChild;
-    q.querySelector('.q-title').value = qData.text || '';
+
+    // auto-resize for question
+    const qTitle = q.querySelector('.q-title');
+    qTitle.value = qData.text || '';
+    autoResizeTextarea(qTitle);
+
     q.querySelector('.q-type').value = qData.type || 'radio';
     q.querySelector('.points-input').value = qData.points ?? 0;
     updateOptions(q.querySelector('.q-type'));
@@ -1530,8 +1556,11 @@ function loadFormFromJSON(data){
       addOption(q.querySelector('.btn-link'));
       const lastOpt = q.querySelector('.options').lastElementChild;
 
-      lastOpt.querySelector('.opt-text').value = opt.text || '';
+      // auto-resize for options
+      const optText = lastOpt.querySelector('.opt-text');
+      optText.value = opt.text || '';
       lastOpt.querySelector('.opt-icon').checked = false; // option unchecked
+      autoResizeTextarea(optText);
 
       // to map UI answers
       lastOpt.querySelector('.opt-icon').checked = !!opt.checked;
@@ -1544,7 +1573,10 @@ function loadFormFromJSON(data){
 
     // feedback
     if(qData.comment){
-      q.querySelector('#comment').value = qData.comment;
+      // auto-resize for feedback
+      const comment = q.querySelector('#comment');
+      comment.value = qData.comment;
+      autoResizeTextarea(comment);
     }
   });
 
@@ -1554,6 +1586,9 @@ function loadFormFromJSON(data){
   showAllQuestions();
   //document.getElementById('questionNav').style.display = 'none';
 
+  // Auto-resize ALL on load
+  //q.querySelectorAll('textarea').forEach(autoResizeTextarea);
+  
   updateJSON();
 }
 
