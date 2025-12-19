@@ -569,7 +569,7 @@
       border-bottom-color: #1a73e8;
     }
 
-    /* Proctor modal */
+    /* Settings modal */
     .proctor-modal{
       position: fixed;
       inset: 0;
@@ -658,6 +658,50 @@
       border: none;
       font-size: 18px;
       cursor: pointer;
+    }
+
+    /* Save button */
+    .proctor-footer{
+      /*margin-top: 20px;*/
+      padding-top: 8px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-save{
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease, transform .1s ease;
+    }
+
+    .btn-save:hover{
+      background: #4338ca;
+    }
+
+    .btn-save:active{
+      transform: scale(0.97);
+    }
+
+    /* Disabled Save button */
+    .btn-save:disabled{
+      background: #c7c9f5;          /* muted purple */
+      color: #ffffff;
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Prevent hover effects when disabled */
+    .btn-save:disabled:hover{
+      background: #c7c9f5;
     }
 
     /* Timer */
@@ -792,13 +836,6 @@
     <div class="proctor-tabs">
       <button class="tab active" onclick="switchSettingsTab('general')">General</button>
       <button class="tab" onclick="switchSettingsTab('proctor')">Proctor 🛡️</button>
-
-      <!--
-      <button class="tab active" onclick="switchProctorTab('timer')">Timer</button>
-      <button class="tab" onclick="switchProctorTab('camera')">Camera</button>
-      <button class="tab" onclick="switchProctorTab('noise')">Microphone</button>
-      <button class="tab" onclick="switchProctorTab('screen')">Screen</button>
-      -->
     </div>
 
     <!-- Tab contents -->
@@ -855,7 +892,6 @@
         </div>
 
         <!-- Camera -->
-        <!--<div class="tab-panel" id="tab-camera">-->
         <label class="toggle-row"><strong>Camera:</strong></label>
         <label class="toggle-row">
           <input type="checkbox" data-proctor="camera-enabled" />
@@ -871,10 +907,8 @@
           <input type="checkbox" data-proctor="camera-eye" />
           <span>Eye-Tracking: Gaze Direction</span>
         </label>
-        <!--</div>-->
 
         <!-- Microphone -->
-        <!--<div class="tab-panel" id="tab-noise">-->
         <label class="toggle-row"><strong>Microphone:</strong></label>
 
         <label class="toggle-row">
@@ -886,10 +920,8 @@
           <input type="checkbox" data-proctor="noise-loud" />
           <span>Noise-detection: Detect loud background noise</span>
         </label>
-        <!--</div>-->
 
         <!-- Screen -->
-        <!--<div class="tab-panel" id="tab-screen">-->
         <label class="toggle-row"><strong>Screen:</strong></label>
 
         <label class="toggle-row">
@@ -921,13 +953,17 @@
           <input type="checkbox" data-proctor="screen-secondmonitor"/>
           <span>Fake "Second Monitor Detection"</span>
         </label>
-        <!--</div>-->
 
       </div>
 
     </div>
 
+    <div class="proctor-footer">
+      <button class="btn-save" onclick="saveProctorSettings()" disabled>💾 Save</button>
+    </div>
+
   </div>
+
 </div>
 
 <script>
@@ -1292,6 +1328,19 @@ function switchSettingsTab(name){
     .classList.add('active');
 }
 
+function saveProctorSettings(){
+  updateJSON();
+
+  const data = outputEl.textContent;
+  localStorage.setItem('formContent', data);
+  
+  document.querySelector('.btn-save').disabled = true;
+
+  closeProctorConfig();
+
+  alert("Settings saved successfully");
+}
+
 // Timer
 function toggleTimer(cb){
   const row = cb.closest('.tab-panel').querySelector('.timer-row');
@@ -1304,7 +1353,7 @@ function fixSeconds(input){
 }
 
 function updateTimerJSON(){
-  const panel = document.getElementById('tab-timer');
+  const panel = document.getElementById('tab-proctor');
   const min = panel.querySelector('.timer-min')?.value || 0;
   const sec = panel.querySelector('.timer-sec')?.value || 0;
 
@@ -1349,7 +1398,7 @@ function updateJSON(){
     });
   });
 
-  form.settings = getProctorSettings();
+  form.settings = form.settings || getProctorSettings();
 
   outputEl.textContent = JSON.stringify(form, null, 2);
   //updateTotalPoints();
@@ -1362,7 +1411,7 @@ function isChecked(key){
 function getProctorSettings(){
   const timerEnabled = isChecked('timer-enabled');
 
-  const timerInputs = document.querySelectorAll('#tab-timer .timer-input');
+  const timerInputs = document.querySelectorAll('#tab-proctor .timer-input');
 
   return {
     general: {
@@ -1568,6 +1617,9 @@ function updateSectionNumbers(){
 Initialization
 ***************************/
 window.onload = async function() {
+
+  setupSettingsChangeTracking();
+
   // Restore Auto-save while editing
   // Restore go back button from Preview
   // Read JSON file (awaitable)
@@ -1589,7 +1641,27 @@ window.onload = async function() {
   }
 }
 
+// Settings: Enable Save on change
+function setupSettingsChangeTracking(){
+  const saveBtn = document.querySelector('.btn-save');
+  if(!saveBtn) return;
 
+  // All settings inputs
+  const inputs = document.querySelectorAll(
+    '#proctorModal [data-proctor], #proctorModal .timer-input'
+  );
+
+  inputs.forEach(input => {
+    input.addEventListener('change', () => {
+      saveBtn.disabled = false;
+    });
+
+    // for number inputs (MM:ss)
+    input.addEventListener('input', () => {
+      saveBtn.disabled = false;
+    });
+  });
+}
 
 </script>
 

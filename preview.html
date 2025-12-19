@@ -722,7 +722,7 @@
       right: 16px;
       bottom: 12px;
       
-      display:flex;
+      display:none;
       align-items:center;
       gap:8px;
 
@@ -1671,39 +1671,43 @@ function updateTimerDisplay(){
 /***************************
 Camera
 ***************************/
+let camera = null;
 let stream = null;
-let mediaRecorder = null;
-let recordedChunks = [];
-let snapshotTimer = null;
 let isCameraStarted = false;
 
 const video = document.getElementById('video');
 const toggleRecordingBtn = document.getElementById('toggleRecording');
 const downloadRecordingBtn = document.getElementById('downloadRecording');
 
-async function startCamera(cameraConfig){
-  debugger;
+async function startCamera(cameraSettings){
   if(stream) return; // already started
+  
+  camera = cameraSettings;
+
+  let faceMesh = null;
 
   try {
+    if(camera.enabled || camera.faceAbsence || camera.eyeTracking) {
     // Eye-Tracking
-    const faceMesh = new window.FaceMesh({
+    faceMesh = new window.FaceMesh({
       locateFile: (file) =>
         `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
     });
+    }
 
-    if(cameraConfig.faceAbsence) {
+    if(camera.faceAbsence || camera.eyeTracking) {
       faceMesh.setOptions({
-        maxNumFaces: 1,
-        refineLandmarks: true, // IMPORTANT → gives iris landmarks (468-478)
+        maxNumFaces: 1, // face detection
+        refineLandmarks: true, // eye-tracking: gives iris landmarks (468-478)
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5,
       });
 
-      faceMesh.onResults(onResults, cameraConfig);
+      faceMesh.onResults(onResults);
     }
 
     // Start camera
+    if(camera.enabled || camera.faceAbsence || camera.eyeTracking) {
     const cam = new window.Camera(video, {
       onFrame: async () => {
         await faceMesh.send({ image: video });
@@ -1712,31 +1716,34 @@ async function startCamera(cameraConfig){
       height: 360,
     });
     cam.start();
+    }
 
-    // set canvas size to video display size
-    document.getElementById("overlay").style.display = "none"; // hide detection rectangle, hide = "none", show = "block"
+    if(camera.faceAbsence || camera.eyeTracking) {
+      // set canvas size to video display size
+      document.getElementById("overlay").style.display = "none"; // hide detection rectangle, hide = "none", show = "block"
 
-    overlay.width = video.videoWidth || video.clientWidth;
-    overlay.height = video.videoHeight || video.clientHeight;
+      overlay.width = video.videoWidth || video.clientWidth;
+      overlay.height = video.videoHeight || video.clientHeight;
+    }
 
-    console.log('Camera started');
-
-    //-------------------------------------//
-    
-    if(cameraConfig.faceAbsence) {
+    if(camera.faceAbsence) {
       // Face detection
       // lazy-load TF and model after camera starts
       await loadModelIfNeeded();
       startDetectLoop();
     }
 
-    isCameraStarted = true;
+    if(camera.enabled || camera.faceAbsence || camera.eyeTracking) {
+      console.log('Camera started');
+      isCameraStarted = true;
+    }
 
   } catch(e) {
-    console.log('Camera error', e);
+    console.warn('Camera error', e);
     alert('Camera error', e);
   }
 
+  if(isCameraStarted){
   function stopCamera(){
     if (stream){
       stream.getTracks().forEach(t => t.stop());
@@ -1747,7 +1754,8 @@ async function startCamera(cameraConfig){
     stopDetectLoop();
     console.log('Camera stopped');
     ctx && ctx.clearRect(0,0,overlay.width, overlay.height);
-}
+  }
+  }
 }
 
 /***************************
@@ -1940,33 +1948,35 @@ function getGazeDirection(landmarks) {
   return "CENTER";
 }
 
-function onResults(results, cameraConfig) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+function onResults(results) {
+  debugger;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
-    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-      ctx.fillStyle = "red";
-      ctx.fillText("FACE NOT DETECTED", 10, 20);
-      return;
-    }
+  if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+    ctx.fillStyle = "red";
+    ctx.fillText("FACE NOT DETECTED", 10, 20);
+    return;
+  }
 
-    const landmarks = results.multiFaceLandmarks[0];
+  const landmarks = results.multiFaceLandmarks[0];
 
-    // Draw mesh
-    window.drawConnectors(ctx, landmarks, window.FACEMESH_TESSELATION, { color: "#0f0" });
+  // Draw mesh
+  window.drawConnectors(ctx, landmarks, window.FACEMESH_TESSELATION, { color: "#0f0" });
 
-    //if(cameraConfig.eyeTracking) {
-      // Eye state
-      const eyeState = analyzeEyes(landmarks);
-      const gaze = getGazeDirection(landmarks);
-    //}
+  if(camera.eyeTracking) {
+    // Eye Tracking
+    // Eye state
+    const eyeState = analyzeEyes(landmarks);
+    const gaze = getGazeDirection(landmarks);
+  }
 
-    ctx.fillStyle = "yellow";
-  /*
-    console.log('Eyes: ', eyeState);
-    console.log('Gaze: ', gaze);
-    console.log('Blink Count: ', blinkCount);
-    */
+  ctx.fillStyle = "yellow";
+/*
+  console.log('Eyes: ', eyeState);
+  console.log('Gaze: ', gaze);
+  console.log('Blink Count: ', blinkCount);
+  */
 }
 
 /***************************
@@ -2171,6 +2181,51 @@ if(globalScreen!=null && globalScreen.secondMonitor) {
 }
 
 /***************************
+Settings
+***************************/
+// General Settings
+function applySettingsViewToggle(general){
+  if(!general) return;
+
+  // View toggle questions (One by One/All)
+  const viewToggle = document.getElementById('viewToggle');
+  const oneByOneToggle = document.getElementById('oneByOneToggle');
+
+  if(general.viewToggleQuestions){
+    viewToggle.style.display = 'flex';
+  } else {
+    viewToggle.style.display = 'none';
+    oneByOneToggle.checked = false;
+  }
+
+  // View questions One by One
+  if(general.viewQuestions) {
+    oneByOneToggle.checked = true;
+    toggleQuestionView(oneByOneToggle);
+  }
+}
+
+// Proctor Camera Settings
+async function applySettingsProctorCamera(cameraSettings) {
+  if(!cameraSettings) return;
+
+  await startCamera(cameraSettings);
+}
+
+async function applySettingsProctorMicrophone(microphone) {
+  if(!microphone) return;
+
+  try {
+      if(microphone.enabled) {
+        await startMicrophone(microphone);
+      }
+  } catch (micErr) {
+    console.warn("Microphone error:", micErr);
+    alert("⚠ Microphone access denied. Noise monitoring disabled.");
+  }
+}
+
+/***************************
 Initialization
 ***************************/
 //async function handleImport(){
@@ -2183,42 +2238,18 @@ window.onload = async function() {
 
     console.log("examData.settings.timer: ",examData.settings.timer);
 
-    // -----------------------------------
+    // Apply Settings/Camera
+    await applySettingsProctorCamera(examData.settings.camera);
 
-    // Apply Settings
-
-    // General Settings
-    if(examData.settings.general.viewToggleQuestions) {
-
-    }
-
-    if(examData.settings.general.viewQuestions) {
-
-    }
-
-    // Proctor Settings
-    let camera = examData.settings.camera;
-
-    if(camera.enabled) {
-      // ask for webcam
-      await startCamera(camera);
-    }
-
-    try {
-      let microphone = examData.settings.microphone;
-        if(microphone.enabled) {
-          // start Microphone
-          await startMicrophone(microphone);
-        }
-    } catch (micErr) {
-      console.warn("Microphone error:", micErr);
-      alert("⚠ Microphone access denied. Noise monitoring disabled.");
-    }
-    
-    // -----------------------------------
+    // Apply Settings/Microphone
+    applySettingsProctorMicrophone(examData.settings.microphone);
 
     // Load questions
     loadFormFromJSON(examData);
+
+    // Apply Settings/View Toggle
+    applySettingsViewToggle(examData.settings.general);
+    
     //addQuestion();
     startTimer();
 

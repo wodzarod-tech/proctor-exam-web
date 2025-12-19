@@ -117,4 +117,32 @@ Proctor configuration
 
 function updateJSON(){
   outputEl.textContent = JSON.stringify(form, null, 2);
+
+updateJSON();
+
+function openProctorConfig(){
   
+  <div class="view-toggle" id="viewToggle">
+
+      document.getElementById("overlay").style.display = "none"; // hide detection rectangle, hide = "none", show = "block"
+
+if(examData.settings.general.viewQuestions)
+
+          <input type="checkbox" id="oneByOneToggle" onchange="toggleQuestionView(this)">
+
+if(examData.settings.general.viewQuestions) {
+
+view-toggle
+
+function applySettingsToUI(settings){
+  toggleQuestionView
+
+applySettingsProctorCamera
+
+applySettingsProctorMicrophone
+
+if(camera.faceAbsence || camera.eyeTracking)
+
+/***************************
+Camera
+***************************/
