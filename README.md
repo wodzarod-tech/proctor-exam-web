@@ -87,89 +87,37 @@ warning at last X minutes
 
 
 
+<span>Score minimum to pass (%)</span>
 
+<div class="toggle-inline">
+  <label class="toggle-row">
+    <input type="checkbox" data-proctor="timer-enabled" onchange="toggleTimer(this)" />
+    <span>Timer Left (hour | minutes)</span>
+  </label>
 
-        [checkbox] Eye-Tracking:
-                   [checkbox] Gaze Direction: No look to the right or left. Always look to the center.
-                   [checkbox] Eye Openness: Open or Blink
+  <div class="timer-row" style="display:none">
+    <input
+      type="number"0
+      class="timer-input"
+      min="0"
+      max="24"
+      step="1"
+      value="0"
+      oninput="fixHour(this); updateTimerJSON()"
+    />h
+    <span>:</span>
+    <input
+      type="number"
+      class="timer-input"
+      min="0"
+      max="59"
+      step="1"
+      value="0"
+      oninput="fixMinutes(this); updateTimerJSON()"
+    />min
+  </div>
+</div>
 
-function getProctorSettings(){
+      hours: timerEnabled ? Number(timerInputs[0]?.value || 0) : 0,
 
-      tabSwitch: isChecked('screen-tab'),
-      fullscreenExit: isChecked('screen-fullscreen'),
-      devToolsOpen: isChecked('screen-devtools'),
-      leaveFullScreen: isChecked('screen-leave'),
-      blockKeyShortcuts: isChecked('screen-keyshortcuts'),
-      secondMonitor: isChecked('screen-secondmonitor')
-
-preview:
-  window.onload = async function() {
-    
-Proctor configuration
-
-      <div class="tab-panel active" id="tab-timer">
-
-    camera: {
-      enabled: isChecked('camera-enabled'),
-
-
-      // General Settings
-
-      style="display:none;"
-
-      form.proctor = getProctorSettings();
-
-<div id="proctorModal" class="proctor-modal hidden">
-
-function updateJSON(){
-  outputEl.textContent = JSON.stringify(form, null, 2);
-
-updateJSON();
-
-function openProctorConfig(){
-  
-  <div class="view-toggle" id="viewToggle">
-
-      document.getElementById("overlay").style.display = "none"; // hide detection rectangle, hide = "none", show = "block"
-
-if(examData.settings.general.viewQuestions)
-
-          <input type="checkbox" id="oneByOneToggle" onchange="toggleQuestionView(this)">
-
-if(examData.settings.general.viewQuestions) {
-
-view-toggle
-
-function applySettingsToUI(settings){
-  toggleQuestionView
-
-applySettingsProctorCamera
-
-applySettingsProctorMicrophone
-
-if(camera.faceAbsence || camera.eyeTracking)
-
-/***************************
-Camera
-***************************/
-applySettingsProctorCamera
-applySettingsProctorMicrophone
-
-applySettingsProctorMicrophone
-
-function screenSwitchdetection(screenSettings)
-
-
-// Proctor Screen Settings
-async function applySettingsProctorMicrophone(microphoneSettings) {
-  if(!microphoneSettings) return;
-
-  if(microphoneSettings.enabled || microphoneSettings.loudNoise) {
-    await startMicrophone(microphoneSettings);
-  }
-}
-
-applySettingsProctorScreen
-
-applySettingsProctorTimer
-function updateTimerDisplay(){
+gradeExamFromJSON

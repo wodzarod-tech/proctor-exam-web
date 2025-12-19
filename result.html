@@ -74,13 +74,16 @@
     document.getElementById("score").textContent =
       `${result.score} / ${result.total}`;
 
-    const status = result.percentage >= 70 ? "✅ PASSED" : "❌ NOT PASSED";
+    const status = result.percentage >= result.scoreMin ? "✅ PASSED" : "❌ NOT PASSED";
 
     let html = `
       <p>
         <strong>
           Score: ${result.percentage}% → <b>${status}</b>
         </strong>
+      </p>
+      <p>
+        Score min: ${result.scoreMin}%</b>
       </p>
     `;
 

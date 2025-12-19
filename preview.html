@@ -680,19 +680,19 @@
     #timer {
       white-space: nowrap; /* ensures the text stays in one line */
       width: auto;         /* automatically adjusts to content */
-      font-size: 15px;
+      font-size: 10px;
       color: #b22222;
-      font-weight:700;
+      font-weight:500;
       /*margin-right: 35px;*/
     }
 
     #webcam {
       position: fixed;
-      /*top: 40px;*/
+      top: 40px;
       right: 10px;
       border: 2px solid #333;
-      width: 120px;
-      height: 100px;
+      width: 90px;
+      height: 78px;
       overflow: hidden;
     }
 
@@ -975,13 +975,14 @@ let examData = null;
 
 // Auto-grade function (JSON-based, correct)
 function gradeExamFromJSON(){
+  debugger;
   let score = 0;
   let total = examData.questions.length;
   let details = [];
 
   examData.questions.forEach((q, index) => {
     const questionEl = document.querySelectorAll('.question')[index];
-    debugger;
+
     // Correct answers from JSON
     const correctOptions = q.options
       .map((opt, i) => opt.checked ? i : null)
@@ -1010,6 +1011,7 @@ function gradeExamFromJSON(){
   return {
     title: examData.title,
     score,
+    scoreMin: examData.settings.general.scoreMin,
     total,
     percentage: Math.round((score / total) * 100),
     details
@@ -1389,7 +1391,7 @@ function submitExam(){
   // collect answers here
   // redirect / show results / save to Firebase
   const result = gradeExamFromJSON();
-  debugger;
+
   localStorage.setItem("examResult", JSON.stringify(result));
 
   window.location.href = "result.html";

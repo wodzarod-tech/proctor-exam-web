@@ -704,6 +704,35 @@
       background: #c7c9f5;
     }
 
+    /* Score to pass */
+    .score-row{
+      display:flex;
+      align-items:center;
+      margin-left:4px;
+    }
+
+    .score-input{
+      width:42px;
+      text-align:center;
+      border:none;
+      border-bottom:1px solid transparent;
+      text-align:right;
+      font-size:13px;
+      color:#202124;
+      outline:none;
+      background:transparent;
+    }
+
+    .score-input:focus{
+      border-bottom-color:#1a73e8;
+    }
+
+    /* keep native steppers */
+    .score-input::-webkit-inner-spin-button,
+    .score-input::-webkit-outer-spin-button{
+      opacity:1;
+    }
+
     /* Timer */
     .timer-row{
       display:flex;
@@ -855,8 +884,22 @@
           <span>View questions One by One</span>
         </label>
 
-      </div>
+        <div class="toggle-inline">
+          <label class="toggle-row">
+            <input type="checkbox" data-proctor="score-min" onchange="toggleScoreMin(this)" />
+            <span>Score minimum to pass (%)</span>
+          </label>
 
+          <div class="score-row" style="display:none">
+              <input
+                type="number"
+                class="score-input"
+                min="0"
+                step="1"
+                value="0"
+              />%
+          </div>
+        </div>
       <div class="tab-panel" id="tab-proctor">
 
         <!-- Timer -->
@@ -865,19 +908,19 @@
         <div class="toggle-inline">
           <label class="toggle-row">
             <input type="checkbox" data-proctor="timer-enabled" onchange="toggleTimer(this)" />
-            <span>Timer Left (hour|minutes)</span>
+            <span>Timer Left (hour | minutes)</span>
           </label>
 
           <div class="timer-row" style="display:none">
             <input
-              type="number"
+              type="number"0
               class="timer-input"
               min="0"
               max="24"
               step="1"
               value="0"
               oninput="fixHour(this); updateTimerJSON()"
-            />
+            />h
             <span>:</span>
             <input
               type="number"
@@ -887,7 +930,7 @@
               step="1"
               value="0"
               oninput="fixMinutes(this); updateTimerJSON()"
-            />
+            />min
           </div>
         </div>
 
@@ -1341,6 +1384,12 @@ function saveProctorSettings(){
   alert("Settings saved successfully");
 }
 
+// Score min
+function toggleScoreMin(cb){
+  const row = cb.closest('.tab-panel').querySelector('.score-row');
+  row.style.display = cb.checked ? 'flex' : 'none';
+}
+
 // Timer
 function toggleTimer(cb){
   const row = cb.closest('.tab-panel').querySelector('.timer-row');
@@ -1414,19 +1463,25 @@ function isChecked(key){
 }
 
 function getProctorSettings(){
-  const timerEnabled = isChecked('timer-enabled');
 
-  const timerInputs = document.querySelectorAll('#tab-proctor .timer-input');
+  // Score Min
+  const scoreMinEnabled = isChecked('score-min');
+  const scoreMinInput = document.querySelector('.score-input');
+
+  // Timer
+  const timerEnabled = isChecked('timer-enabled');
+  const [hoursInput, minutesInput] = document.querySelectorAll('#tab-proctor .timer-input');
 
   return {
     general: {
       viewToggleQuestions: isChecked('view-toggle-questions'),
-      viewQuestions: isChecked('view-questions')
+      viewQuestions: isChecked('view-questions'),
+      scoreMin: scoreMinEnabled ? Number(scoreMinInput?.value || 0) : 0
     },
     timer: {
       enabled: timerEnabled,
-      hours: timerEnabled ? Number(timerInputs[0]?.value || 0) : 0,
-      minutes: timerEnabled ? Number(timerInputs[1]?.value || 0) : 0
+      hours: timerEnabled ? Number(hoursInput?.value || 0) : 0,
+      minutes: timerEnabled ? Number(minutesInput?.value || 0) : 0
     },
     camera: {
       enabled: isChecked('camera-enabled'),
