@@ -778,7 +778,7 @@
 
   <!-- Webcam -->
   <div id="webcam">
-    <div id="timer">Time Left: --:--</div>
+    <div id="timer">Time Left: --:--:--</div>
     <video id="video" autoplay muted playsinline></video>
     <canvas id="overlay" class="overlay"></canvas> <!-- face detection -->
   </div>
@@ -1640,32 +1640,12 @@ function updateSectionNumbers(){
   });
 }
 
-/***************************
-Timer
-***************************/
-let timeLeft = 60 * 60;   // default: 15 minutes, change before start
-let timerInterval = null;
-
-function startTimer(){
-  // you can set timeLeft before startingExam if desired
-  updateTimerDisplay();
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-
-    updateTimerDisplay();
-
-    if(timeLeft <= 0){
-      clearInterval(timerInterval);
-      autoSubmitExam();
-    }
-  }, 1000);
-}
-
 function updateTimerDisplay(){
-  const minutes = Math.max(0, Math.floor(timeLeft / 60));
+  const hours = Math.max(0, Math.floor(timeLeft / 3600));
+  const minutes = Math.max(0, Math.floor((timeLeft % 3600) / 60));
   const seconds = Math.max(0, timeLeft % 60);
-  document.getElementById('timer').textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  document.getElementById('timer').textContent =
+    `Time Left: ${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
 /***************************
@@ -1740,7 +1720,7 @@ async function startCamera(cameraSettings){
 
   } catch(e) {
     console.warn('Camera error', e);
-    alert('Camera error', e);
+    alert('❌ Camera error', e);
   }
 
   if(isCameraStarted){
@@ -1991,80 +1971,153 @@ let noiseSeconds = 0;
 let lastNoiseTime = 0;
 let failed = false;
 
-async function startMicrophone(microphone) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+async function startMicrophone(microphoneSettings) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+    if(microphoneSettings.loudNoise) {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
 
-        if(microphone.loudNoise) {
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 2048;
+      const freqAnalyser = audioCtx.createAnalyser();
+      freqAnalyser.fftSize = 512;
 
-          const freqAnalyser = audioCtx.createAnalyser();
-          freqAnalyser.fftSize = 512;
+      const mic = audioCtx.createMediaStreamSource(stream);
+      mic.connect(analyser);
+      mic.connect(freqAnalyser);
 
-          const mic = audioCtx.createMediaStreamSource(stream);
-          mic.connect(analyser);
-          mic.connect(freqAnalyser);
+      const timeData = new Uint8Array(analyser.fftSize);
+      const freqData = new Uint8Array(freqAnalyser.frequencyBinCount);
 
-          const timeData = new Uint8Array(analyser.fftSize);
-          const freqData = new Uint8Array(freqAnalyser.frequencyBinCount);
+      function update() {
+        analyser.getByteTimeDomainData(timeData);
+        freqAnalyser.getByteFrequencyData(freqData);
 
-          function update() {
-              analyser.getByteTimeDomainData(timeData);
-              freqAnalyser.getByteFrequencyData(freqData);
-
-              // Calculate volume (RMS)
-              let sum = 0;
-              for (let i = 0; i < timeData.length; i++) {
-                  const v = (timeData[i] - 128) / 128;
-                  sum += (v * v);
-              }
-              const volume = Math.sqrt(sum / timeData.length);
-
-              //console.log('volume = ', volume);
-
-              // Check for noise / speaking
-              if (volume > SPEAK_THRESHOLD) {
-                  console.log('🎤 Someone is speaking!');
-                  alert('🎤 Someone is speaking!');
-                  lastNoiseTime = Date.now();
-              } else if (volume > NOISE_THRESHOLD) {
-                  console.log('⚠ Too loud!');
-                  alert('⚠ Too loud!');
-                  lastNoiseTime = Date.now();
-              } else {
-                  //alertBox.textContent = "";
-              }
-
-              // Count continuous noise time
-              if (Date.now() - lastNoiseTime < 1000)
-                noiseSeconds++;
-              else
-                noiseSeconds = 0;
-
-              //console.log('noiseSeconds = ', noiseSeconds);
-
-              // Auto-fail
-              if (!failed && noiseSeconds >= MAX_NOISE_TIME) {
-                  failed = true;
-                  alert("❌ Exam failed: too much noise.");
-              }
-
-              requestAnimationFrame(update);
-          }
-
-          update();
+        // Calculate volume (RMS)
+        let sum = 0;
+        for (let i = 0; i < timeData.length; i++) {
+            const v = (timeData[i] - 128) / 128;
+            sum += (v * v);
         }
-    } catch (e) {
-        alert("Microphone error: " + e.message);
+        const volume = Math.sqrt(sum / timeData.length);
+
+        //console.log('volume = ', volume);
+
+        // Check for noise / speaking
+        if (volume > SPEAK_THRESHOLD) {
+            console.log('🎤 Someone is speaking!');
+            alert('🎤 Someone is speaking!');
+            lastNoiseTime = Date.now();
+        } else if (volume > NOISE_THRESHOLD) {
+            console.log('⚠ Too loud!');
+            alert('⚠ Too loud!');
+            lastNoiseTime = Date.now();
+        } else {
+            //alertBox.textContent = "";
+        }
+
+        // Count continuous noise time
+        if (Date.now() - lastNoiseTime < 1000)
+          noiseSeconds++;
+        else
+          noiseSeconds = 0;
+
+        //console.log('noiseSeconds = ', noiseSeconds);
+
+        // Auto-fail
+        if (!failed && noiseSeconds >= MAX_NOISE_TIME) {
+            failed = true;
+            alert("❌ Exam failed: too much noise.");
+        }
+
+        requestAnimationFrame(update);
+      }
+
+      update();
     }
+  } catch (e) {
+    console.warn("Microphone error:", e);
+    alert("❌ Microphone error: " + e.message);
+  }
 }
 
 /***************************
-Screen-switch-detection
+Settings
 ***************************/
+// General Settings
+function applySettingsViewToggle(general){
+  if(!general) return;
+
+  // View toggle questions (One by One/All)
+  const viewToggle = document.getElementById('viewToggle');
+  const oneByOneToggle = document.getElementById('oneByOneToggle');
+
+  if(general.viewToggleQuestions){
+    viewToggle.style.display = 'flex';
+  } else {
+    viewToggle.style.display = 'none';
+    oneByOneToggle.checked = false;
+  }
+
+  // View questions One by One
+  if(general.viewQuestions) {
+    oneByOneToggle.checked = true;
+    toggleQuestionView(oneByOneToggle);
+  }
+}
+
+// Proctor Timer Settings
+let timeLeft = 1 * 60 * 60;   // default: 1 hour
+let timerInterval = null;
+
+function applySettingsProctorTimer(timerSettings){
+  if(!timerSettings) return;
+
+  if(timerSettings.enabled) {
+    const hours = Number(timerSettings.hours || 0);
+    const minutes = Number(timerSettings.minutes || 0);
+    const seconds = Number(timerSettings.seconds || 0);
+
+    timeLeft = (hours * 3600) + (minutes * 60) + seconds;
+
+    // you can set timeLeft before startingExam if desired
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+
+      updateTimerDisplay();
+
+      if(timeLeft <= 0){
+        clearInterval(timerInterval);
+        autoSubmitExam();
+      }
+    }, 1000);
+  }
+}
+
+// Proctor Camera Settings
+async function applySettingsProctorCamera(cameraSettings) {
+  if(!cameraSettings) return;
+
+  await startCamera(cameraSettings);
+}
+
+// Proctor Microphone Settings
+async function applySettingsProctorMicrophone(microphoneSettings) {
+  if(!microphoneSettings) return;
+
+  if(microphoneSettings.enabled || microphoneSettings.loudNoise) {
+    await startMicrophone(microphoneSettings);
+  }
+}
+
+// ----------------------------------
+// Proctor Screen Settings
+// Screen-switch-detection
+let screen = null;
 let violations = 0;
 const MAX_VIOLATIONS = 10;
 
@@ -2084,12 +2137,12 @@ function addViolation(reason) {
     }
 }
 
-let globalScreen = null;
+function applySettingsProctorScreen(screenSettings) {
 
-function screenSwitchdetection(screen) {
+  if(!screenSettings) return;
 
-  globalScreen = screen;
-  console.log("globalScreen: ", globalScreen);
+  screen = screenSettings;
+
   if(screen.tabSwitch) {
     // Screen-switch detection (tab change + blur/focus)
     document.addEventListener("visibilitychange", () => {
@@ -2137,7 +2190,7 @@ function screenSwitchdetection(screen) {
 
 //---------------------------//
 
-if(globalScreen!=null && globalScreen.devToolsOpen) {
+if(screen!=null && screen.devToolsOpen) {
   // Detect DevTools Opening (3 methods combined)
   // Method A — Size check
   /*
@@ -2167,7 +2220,7 @@ if(globalScreen!=null && globalScreen.devToolsOpen) {
 }
 //---------------------------//
 
-if(globalScreen!=null && globalScreen.secondMonitor) {
+if(screen!=null && screen.secondMonitor) {
   // Fake “Second Monitor Detection” (best possible)
   let originalWidth = window.screen.width;
 
@@ -2181,84 +2234,36 @@ if(globalScreen!=null && globalScreen.secondMonitor) {
 }
 
 /***************************
-Settings
-***************************/
-// General Settings
-function applySettingsViewToggle(general){
-  if(!general) return;
-
-  // View toggle questions (One by One/All)
-  const viewToggle = document.getElementById('viewToggle');
-  const oneByOneToggle = document.getElementById('oneByOneToggle');
-
-  if(general.viewToggleQuestions){
-    viewToggle.style.display = 'flex';
-  } else {
-    viewToggle.style.display = 'none';
-    oneByOneToggle.checked = false;
-  }
-
-  // View questions One by One
-  if(general.viewQuestions) {
-    oneByOneToggle.checked = true;
-    toggleQuestionView(oneByOneToggle);
-  }
-}
-
-// Proctor Camera Settings
-async function applySettingsProctorCamera(cameraSettings) {
-  if(!cameraSettings) return;
-
-  await startCamera(cameraSettings);
-}
-
-async function applySettingsProctorMicrophone(microphone) {
-  if(!microphone) return;
-
-  try {
-      if(microphone.enabled) {
-        await startMicrophone(microphone);
-      }
-  } catch (micErr) {
-    console.warn("Microphone error:", micErr);
-    alert("⚠ Microphone access denied. Noise monitoring disabled.");
-  }
-}
-
-/***************************
 Initialization
 ***************************/
 //async function handleImport(){
 window.onload = async function() {
 
-  try {
-    // Read JSON file (awaitable)
-    const json = localStorage.getItem("formContent");
-    examData = JSON.parse(json);
+  // Read JSON file (awaitable)
+  const json = localStorage.getItem("formContent");
+  examData = JSON.parse(json);
 
-    console.log("examData.settings.timer: ",examData.settings.timer);
+  console.log("examData.settings.timer: ",examData.settings.timer);
 
-    // Apply Settings/Camera
-    await applySettingsProctorCamera(examData.settings.camera);
+  // Apply Settings/Proctor/Camera
+  await applySettingsProctorCamera(examData.settings.camera);
 
-    // Apply Settings/Microphone
-    applySettingsProctorMicrophone(examData.settings.microphone);
+  // Apply Settings/Proctor/Microphone
+  await applySettingsProctorMicrophone(examData.settings.microphone);
 
-    // Load questions
-    loadFormFromJSON(examData);
+  // Load questions
+  loadFormFromJSON(examData);
 
-    // Apply Settings/View Toggle
-    applySettingsViewToggle(examData.settings.general);
-    
-    //addQuestion();
-    startTimer();
+  // Apply Settings/View Toggle
+  applySettingsViewToggle(examData.settings.general);
+  
+  //addQuestion();
 
-    let screen = examData.settings.screen;
-    screenSwitchdetection(screen);
+  // Apply Settings/Proctor/Timer
+  applySettingsProctorTimer(examData.settings.timer);
 
-  } catch(err) {
-    alert('❌ Camera error or permission denied: ' + err.message);
-  };
+  // Apply Settings/Proctor/Screen
+  applySettingsProctorScreen(examData.settings.screen);
 }
 
 new Sortable(questionsEl, {

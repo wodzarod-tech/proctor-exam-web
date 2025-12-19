@@ -82,6 +82,12 @@ Disable Submit until all required answered
 
 🖋 Digital signature image
 
+warning at last X minutes
+
+
+
+
+
 
         [checkbox] Eye-Tracking:
                    [checkbox] Gaze Direction: No look to the right or left. Always look to the center.
@@ -146,3 +152,24 @@ if(camera.faceAbsence || camera.eyeTracking)
 /***************************
 Camera
 ***************************/
+applySettingsProctorCamera
+applySettingsProctorMicrophone
+
+applySettingsProctorMicrophone
+
+function screenSwitchdetection(screenSettings)
+
+
+// Proctor Screen Settings
+async function applySettingsProctorMicrophone(microphoneSettings) {
+  if(!microphoneSettings) return;
+
+  if(microphoneSettings.enabled || microphoneSettings.loudNoise) {
+    await startMicrophone(microphoneSettings);
+  }
+}
+
+applySettingsProctorScreen
+
+applySettingsProctorTimer
+function updateTimerDisplay(){
