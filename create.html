@@ -791,9 +791,9 @@
     <!-- Tabs -->
     <div class="proctor-tabs">
       <button class="tab active" onclick="switchProctorTab('timer')">Timer</button>
-      <button class="tab" onclick="switchProctorTab('camera')">Camera detection</button>
-      <button class="tab" onclick="switchProctorTab('noise')">Noise detection</button>
-      <button class="tab" onclick="switchProctorTab('screen')">Screen detection</button>
+      <button class="tab" onclick="switchProctorTab('camera')">Camera</button>
+      <button class="tab" onclick="switchProctorTab('noise')">Microphone</button>
+      <button class="tab" onclick="switchProctorTab('screen')">Screen</button>
     </div>
 
     <!-- Tab contents -->
@@ -805,7 +805,7 @@
         <div class="toggle-inline">
           <label class="toggle-row">
             <input type="checkbox" data-proctor="timer-enabled" onchange="toggleTimer(this)" />
-            <span>Timer Left</span>
+            <span>Timer Left (MM:ss)</span>
           </label>
 
           <div class="timer-row" style="display:none">
@@ -841,19 +841,19 @@
 
         <label class="toggle-row">
           <input type="checkbox" data-proctor="camera-face" />
-          <span>Detect Face absence</span>
+          <span>Face Detection: Detect Face absence</span>
         </label>
 
         <label class="toggle-row">
           <input type="checkbox" data-proctor="camera-eye" />
-          <span>Eye-Tracking</span>
+          <span>Eye-Tracking: Gaze Direction</span>
         </label>
       </div>
 
       <!-- NOISE -->
       <div class="tab-panel" id="tab-noise">
         <label class="toggle-row">
-          <input type="checkbox" data-proctor="noise-enabled" />
+          <input type="checkbox" data-proctor="microphone-enabled" />
           <span>Enable microphone</span>
         </label>
 
@@ -867,13 +867,34 @@
       <div class="tab-panel" id="tab-screen">
         <label class="toggle-row">
           <input type="checkbox" data-proctor="screen-tab"/>
-          <span>Detect tab switching</span>
+          <span>Detect tab switching or minimize</span>
         </label>
 
         <label class="toggle-row">
           <input type="checkbox" data-proctor="screen-fullscreen"/>
           <span>Detect fullscreen exit</span>
         </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" data-proctor="screen-devtools"/>
+          <span>Detect DevTools Opening</span>
+        </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" data-proctor="screen-leave"/>
+          <span>Detect leaving fullscreen</span>
+        </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" data-proctor="screen-keyshortcuts"/>
+          <span>Block Keyboard Shortcuts</span>
+        </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" data-proctor="screen-secondmonitor"/>
+          <span>Fake "Second Monitor Detection"</span>
+        </label>
+
       </div>
 
     </div>
@@ -1326,13 +1347,17 @@ function getProctorSettings(){
       faceAbsence: isChecked('camera-face'),
       eyeTracking: isChecked('camera-eye')
     },
-    noise: {
-      enabled: isChecked('noise-enabled'),
+    microphone: {
+      enabled: isChecked('microphone-enabled'),
       loudNoise: isChecked('noise-loud')
     },
     screen: {
       tabSwitch: isChecked('screen-tab'),
-      fullscreenExit: isChecked('screen-fullscreen')
+      fullscreenExit: isChecked('screen-fullscreen'),
+      devToolsOpen: isChecked('screen-devtools'),
+      leaveFullScreen: isChecked('screen-leave'),
+      blockKeyShortcuts: isChecked('screen-keyshortcuts'),
+      secondMonitor: isChecked('screen-secondmonitor')
     }
   };
 }

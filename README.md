@@ -31,11 +31,28 @@ Proctor Exam Web
 6. Answer key selection
 7. Required indicator (*)
 8. Proctor settings:
-   8.1. Timer
-   8.1. Face Detection
-   8.2. Screen-switch-detection
-   8.3. Noise-detection
-   8.4. Eye-tracking
+   8.1. Timer:
+        Timer Left: MM:ss
+   8.2. Camera:
+        Enable camera
+        Face Detection: Detect Face absence
+        Eye-Tracking:
+          Gaze Direction: No look to the right or left. Always look to the center.
+          Eye Openness: Open or Blink
+   8.3. Microphone:
+        Enable microphone
+        Noise-detection: Detect loud background noise
+          Someone is speaking
+          Too loud
+   8.4. Screen:
+        Screen-switch-detection:
+          Detect tab switching or minimize
+          Detect fullscreen exit
+          Detect DevTools Opening
+          Detect leaving fullscreen
+          Block Keyboard Shortcuts
+          Fake "Second Monitor Detection"
+
 9. Show all questions/One question at a time (exam mode / paginated)
 10. Do options multiline
 11. Auto-save while editing
@@ -66,137 +83,19 @@ Disable Submit until all required answered
 🖋 Digital signature image
 
 
+        [checkbox] Eye-Tracking:
+                   [checkbox] Gaze Direction: No look to the right or left. Always look to the center.
+                   [checkbox] Eye Openness: Open or Blink
 
-***********************************************
+function getProctorSettings(){
 
-function exportJSON(){
-  const data = outputEl.textContent;
-  if(!data) return;
+      tabSwitch: isChecked('screen-tab'),
+      fullscreenExit: isChecked('screen-fullscreen'),
+      devToolsOpen: isChecked('screen-devtools'),
+      leaveFullScreen: isChecked('screen-leave'),
+      blockKeyShortcuts: isChecked('screen-keyshortcuts'),
+      secondMonitor: isChecked('screen-secondmonitor')
 
-examDraft
-
-
-
-function handleImport(){
-  
-/***************************
-Import panel
-***************************/
-async function handleImport(){
-
-  /* -------------------------
-   Exam parsing & rendering
-   ------------------------- */
-let answers = [];        // expected answers, in order
-
-let recordingActive = false;
-let oneAtTime = true;
-let currentIndex = 0;
-
-Violation #2: Tab switch or minimize
-
-Screen-switch-detection
-
----
-
-async function handleImport() -> preview
-
-function importJSON() -> create
-
-function exportJSON(){
-  const data = outputEl.textContent;
-  if(!data) return;
-
-I have:
-
-I have this button, do open preview.html in the same tab : 
-<button class="g-tooltip" data-tooltip="Preview exam" onclick="previewExam()">👁️</button>
-
-function previewExam() {
-  const data = outputEl.textContent;
-  if(!data) return;
-
-  localStorage.setItem('formContent', data);
-  debugger;
-  // Option 1: open preview in a new tab
-  window.open("preview.html", "_blank");
-
-  // Option 2 (alternative): show preview modal
-  // document.getElementById("previewModal").classList.add("open");
-}
-
-loadFormFromJSON
-
-updateJSON
-
-  formTitle.value = data.title || '';
-  formDesc.value = data.description || '';
-  JSON.stringify
-  JSON.parse
-
-updateSubmitVisibility
-
-showAllQuestions
-toggle.checked
-
-submitBtn.style.display = 'inline-block';
-    document.getElementById('questionNav').style.display = 'block';
-
-<div id="timer">Time Left: --:--</div>
-
-
-
-<div id="examTimer" class="exam-timer">
-  ⏱ <span id="timeLeft">00:00</span>
-</div>
-
-function startTimer(){
-Auto-grade
-window.onload = async function() {
-function addOption(btn)
-
----
-      <div class="q-points">
-        <input type="number"
-          class="points-input"
-          min="0"
-          step="0.01"
-          placeholder="0"
-          oninput="limitDecimals(this); updateJSON()" />
-        <span>points</span>
-      </div>
-
-
---
-function submitExam(){
-
-gradeExamFromJSON()
-
-let examData = null;
-
-    const selectedOptions = [...questionEl.querySelectorAll('input:checked')]
-      .map(input => Number(input.dataset.optionIndex));
-
-  // to map UI answers
-  const optionIndex = options.querySelectorAll('.option').length - 1;
-  opt.querySelector('.opt-icon').dataset.optionIndex = optionIndex;
-    /* resulting HTML:
-    <input type="radio" data-option-index="0">
-    <input type="radio" data-option-index="1">
-    */
-  //
-  // auto-resize: add question/option multiline
-
-do multiulne when I write an option, exactly like when I write question
- <input class="opt-text" type="text" placeholder="Option 1">
-
-<textarea class="q-title" placeholder="Question" rows="1"></textarea>
-
-  localStorage.setItem('formContent', data);
-
-
-
-
-
-
-this is the final boss feature.
+preview:
+  window.onload = async function() {
+    

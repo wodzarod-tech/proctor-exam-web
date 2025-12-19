@@ -1677,7 +1677,8 @@ const video = document.getElementById('video');
 const toggleRecordingBtn = document.getElementById('toggleRecording');
 const downloadRecordingBtn = document.getElementById('downloadRecording');
 
-async function startCamera(){
+async function startCamera(cameraConfig){
+  debugger;
   if(stream) return; // already started
 
   try {
@@ -1687,14 +1688,16 @@ async function startCamera(){
         `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
     });
 
-    faceMesh.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true, // IMPORTANT → gives iris landmarks (468-478)
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
+    if(cameraConfig.faceAbsence) {
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true, // IMPORTANT → gives iris landmarks (468-478)
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
 
-    faceMesh.onResults(onResults);
+      faceMesh.onResults(onResults, cameraConfig);
+    }
 
     // Start camera
     const cam = new window.Camera(video, {
@@ -1716,10 +1719,12 @@ async function startCamera(){
 
     //-------------------------------------//
     
-    // Face detection
-    // lazy-load TF and model after camera starts
-    await loadModelIfNeeded();
-    startDetectLoop();
+    if(cameraConfig.faceAbsence) {
+      // Face detection
+      // lazy-load TF and model after camera starts
+      await loadModelIfNeeded();
+      startDetectLoop();
+    }
 
     isCameraStarted = true;
 
@@ -1931,31 +1936,33 @@ function getGazeDirection(landmarks) {
   return "CENTER";
 }
 
-function onResults(results) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+function onResults(results, cameraConfig) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
-  if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
-    ctx.fillStyle = "red";
-    ctx.fillText("FACE NOT DETECTED", 10, 20);
-    return;
-  }
+    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+      ctx.fillStyle = "red";
+      ctx.fillText("FACE NOT DETECTED", 10, 20);
+      return;
+    }
 
-  const landmarks = results.multiFaceLandmarks[0];
+    const landmarks = results.multiFaceLandmarks[0];
 
-  // Draw mesh
-  window.drawConnectors(ctx, landmarks, window.FACEMESH_TESSELATION, { color: "#0f0" });
+    // Draw mesh
+    window.drawConnectors(ctx, landmarks, window.FACEMESH_TESSELATION, { color: "#0f0" });
 
-  // Eye state
-  const eyeState = analyzeEyes(landmarks);
-  const gaze = getGazeDirection(landmarks);
+    //if(cameraConfig.eyeTracking) {
+      // Eye state
+      const eyeState = analyzeEyes(landmarks);
+      const gaze = getGazeDirection(landmarks);
+    //}
 
-  ctx.fillStyle = "yellow";
- /*
-  console.log('Eyes: ', eyeState);
-  console.log('Gaze: ', gaze);
-  console.log('Blink Count: ', blinkCount);
-  */
+    ctx.fillStyle = "yellow";
+  /*
+    console.log('Eyes: ', eyeState);
+    console.log('Gaze: ', gaze);
+    console.log('Blink Count: ', blinkCount);
+    */
 }
 
 /***************************
@@ -1970,70 +1977,72 @@ let noiseSeconds = 0;
 let lastNoiseTime = 0;
 let failed = false;
 
-async function startMicrophone() {
+async function startMicrophone(microphone) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
 
-        const freqAnalyser = audioCtx.createAnalyser();
-        freqAnalyser.fftSize = 512;
+        if(microphone.loudNoise) {
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 2048;
 
-        const mic = audioCtx.createMediaStreamSource(stream);
-        mic.connect(analyser);
-        mic.connect(freqAnalyser);
+          const freqAnalyser = audioCtx.createAnalyser();
+          freqAnalyser.fftSize = 512;
 
-        const timeData = new Uint8Array(analyser.fftSize);
-        const freqData = new Uint8Array(freqAnalyser.frequencyBinCount);
+          const mic = audioCtx.createMediaStreamSource(stream);
+          mic.connect(analyser);
+          mic.connect(freqAnalyser);
 
-        function update() {
-            analyser.getByteTimeDomainData(timeData);
-            freqAnalyser.getByteFrequencyData(freqData);
+          const timeData = new Uint8Array(analyser.fftSize);
+          const freqData = new Uint8Array(freqAnalyser.frequencyBinCount);
 
-            // Calculate volume (RMS)
-            let sum = 0;
-            for (let i = 0; i < timeData.length; i++) {
-                const v = (timeData[i] - 128) / 128;
-                sum += (v * v);
-            }
-            const volume = Math.sqrt(sum / timeData.length);
+          function update() {
+              analyser.getByteTimeDomainData(timeData);
+              freqAnalyser.getByteFrequencyData(freqData);
 
-            //console.log('volume = ', volume);
+              // Calculate volume (RMS)
+              let sum = 0;
+              for (let i = 0; i < timeData.length; i++) {
+                  const v = (timeData[i] - 128) / 128;
+                  sum += (v * v);
+              }
+              const volume = Math.sqrt(sum / timeData.length);
 
-            // Check for noise / speaking
-            if (volume > SPEAK_THRESHOLD) {
-                console.log('🎤 Someone is speaking!');
-                alert('🎤 Someone is speaking!');
-                lastNoiseTime = Date.now();
-            } else if (volume > NOISE_THRESHOLD) {
-                console.log('⚠ Too loud!');
-                alert('⚠ Too loud!');
-                lastNoiseTime = Date.now();
-            } else {
-                //alertBox.textContent = "";
-            }
+              //console.log('volume = ', volume);
 
-            // Count continuous noise time
-            if (Date.now() - lastNoiseTime < 1000)
-              noiseSeconds++;
-            else
-              noiseSeconds = 0;
+              // Check for noise / speaking
+              if (volume > SPEAK_THRESHOLD) {
+                  console.log('🎤 Someone is speaking!');
+                  alert('🎤 Someone is speaking!');
+                  lastNoiseTime = Date.now();
+              } else if (volume > NOISE_THRESHOLD) {
+                  console.log('⚠ Too loud!');
+                  alert('⚠ Too loud!');
+                  lastNoiseTime = Date.now();
+              } else {
+                  //alertBox.textContent = "";
+              }
 
-            //console.log('noiseSeconds = ', noiseSeconds);
+              // Count continuous noise time
+              if (Date.now() - lastNoiseTime < 1000)
+                noiseSeconds++;
+              else
+                noiseSeconds = 0;
 
-            // Auto-fail
-            if (!failed && noiseSeconds >= MAX_NOISE_TIME) {
-                failed = true;
-                alert("❌ Exam failed: too much noise.");
-            }
+              //console.log('noiseSeconds = ', noiseSeconds);
 
-            requestAnimationFrame(update);
+              // Auto-fail
+              if (!failed && noiseSeconds >= MAX_NOISE_TIME) {
+                  failed = true;
+                  alert("❌ Exam failed: too much noise.");
+              }
+
+              requestAnimationFrame(update);
+          }
+
+          update();
         }
-
-        update();
-
     } catch (e) {
         alert("Microphone error: " + e.message);
     }
@@ -2061,87 +2070,101 @@ function addViolation(reason) {
     }
 }
 
-function screenSwitchdetection() {
+let globalScreen = null;
 
-// Block Keyboard Shortcuts (as many as possible)
-document.addEventListener("keydown", (e) => {
-    const blockedCombos = [
-        e.ctrlKey && e.key === "t",
-        e.ctrlKey && e.key === "w",
-        e.ctrlKey && e.key === "n",
-        e.ctrlKey && e.key === "r",
-        e.key === "F11",
-        e.key === "F5",
-        e.key === "Escape",
-        //e.key === "F12", // Devtools
-    ];
+function screenSwitchdetection(screen) {
 
-    if (blockedCombos.some(Boolean)) {
-        e.preventDefault();
-        addViolation(`Blocked shortcut: ${e.key}`);
-    }
-});
-
-//---------------------------//
-
-// Detect DevTools Opening (3 methods combined)
-// Method A — Size check
-/*
-setInterval(() => {
-  if(isCameraStarted) {
-    const threshold = 160;
-    if (window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold) {
-        addViolation("DevTools detected (resize)");
-    }
+  globalScreen = screen;
+  console.log("globalScreen: ", globalScreen);
+  if(screen.tabSwitch) {
+    // Screen-switch detection (tab change + blur/focus)
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) addViolation("Tab switch or minimize");
+    });
+    /*
+    window.addEventListener("blur", () => {
+        addViolation("Window lost focus (possible Alt+Tab)");
+    });
+    */
   }
-}, 1000);
-*/
-// Method B — Debugger trap
-let check = false;
-setInterval(() => {
-  if(isCameraStarted) {
-    const start = Date.now();
-    if (Date.now() - start > 10) {
-        addViolation("DevTools detected (debugger slowdown)");
-    }
+  
+  //---------------------------//
+
+  if(screen.fullscreenExit) {
+    // Detect leaving fullscreen
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) addViolation("Exited fullscreen");
+    });
   }
-}, 2000);
 
-// Method C — Console open check
-console.log("%cSTOP", "font-size: 100px; color: red;");
+  //---------------------------//
+
+  if(screen.blockKeyShortcuts) {
+    // Block Keyboard Shortcuts (as many as possible)
+    document.addEventListener("keydown", (e) => {
+        const blockedCombos = [
+            e.ctrlKey && e.key === "t",
+            e.ctrlKey && e.key === "w",
+            e.ctrlKey && e.key === "n",
+            e.ctrlKey && e.key === "r",
+            e.key === "F11",
+            e.key === "F5",
+            e.key === "Escape",
+            //e.key === "F12", // Devtools
+        ];
+
+        if (blockedCombos.some(Boolean)) {
+            e.preventDefault();
+            addViolation(`Blocked shortcut: ${e.key}`);
+        }
+    });
+  }
+}
 
 //---------------------------//
 
-// Screen-switch detection (tab change + blur/focus)
-document.addEventListener("visibilitychange", () => {
-    if (document.hidden) addViolation("Tab switch or minimize");
-});
-/*
-window.addEventListener("blur", () => {
-    addViolation("Window lost focus (possible Alt+Tab)");
-});
-*/
+if(globalScreen!=null && globalScreen.devToolsOpen) {
+  // Detect DevTools Opening (3 methods combined)
+  // Method A — Size check
+  /*
+  setInterval(() => {
+    if(isCameraStarted) {
+      const threshold = 160;
+      if (window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold) {
+          addViolation("DevTools detected (resize)");
+      }
+    }
+  }, 1000);
+  */
+  // Method B — Debugger trap
+  let check = false;
+  setInterval(() => {
+    if(isCameraStarted) {
+      const start = Date.now();
+      if (Date.now() - start > 10) {
+          addViolation("DevTools detected (debugger slowdown)");
+      }
+    }
+  }, 2000);
 
-//---------------------------//
-
-// Detect leaving fullscreen
-document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) addViolation("Exited fullscreen");
-});
+  // Method C — Console open check
+  console.log("%cSTOP", "font-size: 100px; color: red;");
 }
 //---------------------------//
 
-// Fake “Second Monitor Detection” (best possible)
-let originalWidth = window.screen.width;
+if(globalScreen!=null && globalScreen.secondMonitor) {
+  // Fake “Second Monitor Detection” (best possible)
+  let originalWidth = window.screen.width;
 
-setInterval(() => {
-  if(isCameraStarted) {
-    if (window.screen.width !== originalWidth) {
-        addViolation("Possible second monitor usage");
+  setInterval(() => {
+    if(isCameraStarted) {
+      if (window.screen.width !== originalWidth) {
+          addViolation("Possible second monitor usage");
+      }
     }
-  }
-}, 3000);
+  }, 3000);
+}
 
 /***************************
 Initialization
@@ -2154,23 +2177,37 @@ window.onload = async function() {
     const json = localStorage.getItem("formContent");
     examData = JSON.parse(json);
 
-    // ask for webcam
-    //await startCamera();
+    console.log("examData.proctor.timer: ",examData.proctor.timer);
+
+    // -----------------------------------
+    // Apply Proctor Configuration
+    let camera = examData.proctor.camera;
+
+    if(camera.enabled) {
+      // ask for webcam
+      await startCamera(camera);
+    }
 
     try {
-      // start Microphone
-      //await startMicrophone();
+      let microphone = examData.proctor.microphone;
+        if(microphone.enabled) {
+          // start Microphone
+          await startMicrophone(microphone);
+        }
     } catch (micErr) {
       console.warn("Microphone error:", micErr);
       alert("⚠ Microphone access denied. Noise monitoring disabled.");
     }
     
+    // -----------------------------------
+
     // Load questions
     loadFormFromJSON(examData);
     //addQuestion();
     startTimer();
 
-    //screenSwitchdetection();
+    let screen = examData.proctor.screen;
+    screenSwitchdetection(screen);
 
   } catch(err) {
     alert('❌ Camera error or permission denied: ' + err.message);
