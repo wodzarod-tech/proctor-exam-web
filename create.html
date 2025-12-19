@@ -877,6 +877,16 @@
 
         <label class="toggle-row"><strong>General:</strong></label>
         <label class="toggle-row">
+          <input type="checkbox" data-proctor="shuffle-questions" />
+          <span>Shuffle questions</span>
+        </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" data-proctor="shuffle-options" />
+          <span>Shuffle options</span>
+        </label>
+
+        <label class="toggle-row">
           <input type="checkbox" data-proctor="view-toggle-questions" />
           <span>View toggle questions (One by One/All)</span>
         </label>
@@ -1476,6 +1486,8 @@ function getProctorSettings(){
 
   return {
     general: {
+      shuffleQuestions: isChecked('shuffle-questions'),
+      shuffleOptions: isChecked('shuffle-options'),
       viewToggleQuestions: isChecked('view-toggle-questions'),
       viewQuestions: isChecked('view-questions'),
       scoreMin: scoreMinEnabled ? Number(scoreMinInput?.value || 0) : 0

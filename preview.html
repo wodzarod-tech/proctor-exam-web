@@ -2049,7 +2049,7 @@ async function startMicrophone(microphoneSettings) {
 Settings
 ***************************/
 // General Settings
-function applySettingsViewToggle(general){
+function applySettingsGeneral(general){
   if(!general) return;
 
   // View toggle questions (One by One/All)
@@ -2068,6 +2068,17 @@ function applySettingsViewToggle(general){
     oneByOneToggle.checked = true;
     toggleQuestionView(oneByOneToggle);
   }
+  debugger;
+  // Shuffle questions
+  if(general.shuffleQuestions) {
+    
+  }
+
+  // Shuffle options
+  if(general.shuffleOptions) {
+    
+  }
+  
 }
 
 // Proctor Timer Settings
@@ -2256,8 +2267,8 @@ window.onload = async function() {
   // Load questions
   loadFormFromJSON(examData);
 
-  // Apply Settings/View Toggle
-  applySettingsViewToggle(examData.settings.general);
+  // Apply Settings/General
+  applySettingsGeneral(examData.settings.general);
   
   //addQuestion();
 
