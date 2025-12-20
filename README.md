@@ -206,3 +206,8 @@ window.onload = async function() {
   }
 }
 
+function previewExam() {
+
+      <textarea class="q-title" placeholder="Question" rows="1"></textarea>
+
+function addOption(btn){
