@@ -85,3 +85,24 @@ Disable Submit until all required answered
 warning at last X minutes
 
 ---
+style="display:none;"
+
+addQuestion
+      <div class="q-points">
+        <input type="number"
+          class="points-input"
+          min="0"
+          step="0.01"
+          placeholder="0"
+          oninput="limitDecimals(this); updateJSON()" />
+        <span>points</span>
+      </div>
+
+
+
+PENDINGS:
+1. In create.html addSection().
+2. Shuffle questions
+3. Shuffle options
+
+

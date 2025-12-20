@@ -672,7 +672,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
+      padding: 1px 20px;
       border-bottom: 1px solid var(--border);
     }
 
@@ -699,6 +699,8 @@
 
     .settings-content{
       padding: 20px;
+      padding-top: 8px;
+      padding-bottom: 1px;
     }
 
     .tab-panel{
@@ -739,8 +741,8 @@
     /* Save button */
     .proctor-footer{
       /*margin-top: 20px;*/
-      padding-top: 8px;
-      border-top: 1px solid #eee;
+      /*padding-top: 8px;*/
+      /*border-top: 1px solid #eee;*/
       display: flex;
       justify-content: center;
     }
@@ -913,7 +915,7 @@
 
   <div class="toolbar-buttons">
     <button class="g-tooltip" data-tooltip="Add question" onclick="addQuestion()">+</button>
-    <button class="g-tooltip" data-tooltip="Add section" onclick="addSection()">≡</button>
+    <button class="g-tooltip" data-tooltip="Add section" style="display:none;" onclick="addSection()">≡</button>
     <button class="g-tooltip" data-tooltip="Import Exam" onclick="importJSON()">📂</button>
     <button class="g-tooltip" data-tooltip="Export Exam" onclick="exportJSON()">💾</button>
     <button class="g-tooltip" data-tooltip="Settings" onclick="openProctorConfig()">⚙️</button>
@@ -952,12 +954,12 @@
       <div class="tab-panel active" id="tab-general">
 
         <label class="toggle-row"><strong>General:</strong></label>
-        <label class="toggle-row">
+        <label class="toggle-row" style="display:none;">
           <input type="checkbox" data-proctor="shuffle-questions" />
           <span>Shuffle questions</span>
         </label>
 
-        <label class="toggle-row">
+        <label class="toggle-row" style="display:none;">
           <input type="checkbox" data-proctor="shuffle-options" />
           <span>Shuffle options</span>
         </label>
