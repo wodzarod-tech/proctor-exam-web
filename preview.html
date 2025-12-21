@@ -787,8 +787,16 @@
       background: #000 
     }
 
+    .preview-topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 16px;
+    }
+
     .view-toggle{
-      position: absolute;
+      position: static;
       right: 16px;
       bottom: 12px;
       
@@ -893,7 +901,20 @@
   <div class="container">
 
     <!-- Form header -->
-  <button id="goBack" class="g-tooltip" data-tooltip="Back to editor" onclick="window.location.href='create.html'">⬅ Back</button>
+  <div class="preview-topbar">
+    <button id="goBack" class="g-tooltip" data-tooltip="Back to editor" onclick="window.location.href='create.html'">⬅ Back</button>
+
+    <div class="view-toggle" id="viewToggle">
+      <span>View:</span>
+
+      <label class="switch"> 
+        <input type="checkbox" id="oneByOneToggle" onchange="toggleQuestionView(this)">
+        <span class="slider"></span>
+      </label>
+
+      <span>One by one</span>
+    </div>
+  </div>
 
   <div class="card form-header">
     <div class="form-header-row">
@@ -905,17 +926,6 @@
       <div class="total-points">
         <span>Total points</span>
         <strong id="totalPoints">0</strong>
-      </div>
-
-      <div class="view-toggle" id="viewToggle">
-        <span>View:</span>
-
-        <label class="switch"> 
-          <input type="checkbox" id="oneByOneToggle" onchange="toggleQuestionView(this)">
-          <span class="slider"></span>
-        </label>
-
-        <span>One by one</span>
       </div>
     </div>
 

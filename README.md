@@ -107,6 +107,11 @@ PENDINGS:
 4. sell it
 
 
+  <button id="goBack" class="g-tooltip" data-tooltip="Back to editor" onclick="window.location.href='create.html'">⬅ Back</button>
+
+it works. Now I have this preview.html, want to put the id="viewToggle" in the same row of goBack button but in the right corner:
+
+
 
 
 
