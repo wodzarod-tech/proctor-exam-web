@@ -1527,16 +1527,15 @@ function updateSubmitVisibility() {
 // Protect manual Submit (no double submit)
 let examSubmitted = false;
 
-function submitExam(){
+function submitExam(wasSubmited){
   if (examSubmitted) return;
   
   examSubmitted = true;
 
   clearInterval(timerInterval);
 
-  // 👉 collect answers here
-  console.log("Exam submitted");
-  alert("Exam submitted!");
+  if(!wasSubmited)
+    alert("Exam submitted!");
 
   // collect answers here
   // redirect / show results / save to Firebase
@@ -1553,7 +1552,7 @@ function submitExam(){
 function autoSubmitExam(){
   alert("⏱ Time is up! Exam submitted automatically.");
 
-  submitExam();
+  submitExam(true);
 }
 
 /***************************
@@ -2316,6 +2315,12 @@ let timerInterval = null;
 function applySettingsProctorTimer(timerSettings){
   if(!timerSettings) return;
   
+  if(examResult?.certificateId) {
+    localStorage.removeItem("examResult");
+    clearInterval(timerInterval);
+    return;
+  }
+
   if(!timerSettings.enabled) {
     document.getElementById("timer").style.display = "block";
     return;

@@ -105,3 +105,18 @@ PENDINGS:
 2. impl start exam
 3. deploy free
 4. sell it
+
+
+
+
+
+
+function submitExam(){
+  clearInterval(timerInterval);
+
+window.onload = async function() {
+
+applySettingsProctorTimer
+
+    if(examResult?.certificateId) {
+      localStorage.removeItem("examResult");
