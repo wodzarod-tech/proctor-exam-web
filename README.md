@@ -101,12 +101,25 @@ PENDINGS:
   </div>
 8. when subbmit automatically must to appear the result page
 
-2. add button to see correct and incorrect questions
 2. impl start exam
 3. deploy free
 4. sell it
 
 
+viewToggleQuestions
+        <label class="toggle-row">
+          <input type="checkbox" id="viewToggleQuestions" data-proctor="view-toggle-questions" />
+          <span>View toggle questions (One by One/All)</span>
+        </label>
+
+
+function importJSON(){
+
+.option .opt-text{
+
+
+
+window.onload = async function() {
 
 
 

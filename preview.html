@@ -1124,7 +1124,6 @@ let examData = null;
 
 // Auto-grade function (JSON-based, correct)
 function gradeExamFromJSON(){
-  debugger;
   let score = 0;
   let total = examData.questions.length;
   let details = [];
@@ -2220,7 +2219,6 @@ function getGazeDirection(landmarks) {
 }
 
 function onResults(results) {
-  debugger;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
@@ -2363,7 +2361,7 @@ function applySettingsGeneral(general){
     oneByOneToggle.checked = true;
     toggleQuestionView(oneByOneToggle);
   }
-  debugger;
+
   // Shuffle questions
   if(general.shuffleQuestions) {
     
