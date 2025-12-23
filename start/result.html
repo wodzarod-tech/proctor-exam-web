@@ -3,58 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Exam Result</title>
-<style>
-  body{
-    font-family: system-ui;
-    background:#f6f7fb;
-    padding:40px;
-  }
 
-  .card{
-    max-width:500px;
-    margin:auto;
-    background:white;
-    border-radius:12px;
-    padding:30px;
-    box-shadow:0 10px 25px rgba(0,0,0,.1);
-    text-align:center;
-  }
-
-  /* list elements */
-  ul{
-    margin-top:20px;
-    padding-left:20px;
-    text-align:left;       /* ⬅ left justify text */
-  }
-
-  li{
-    margin-bottom:8px;
-    line-height:1.4;
-  }
-
-  .score{
-    font-size:48px;
-    font-weight:bold;
-    color:#673ab7;
-  }
-
-  /* Certificate */
-  #certificateBtn{
-    margin-top:12px;
-    padding:10px 16px;
-    border:none;
-    border-radius:20px;
-    background:#2e7d32;
-    color:white;
-    font-size:14px;
-    cursor:pointer;
-  }
-
-  #certificateBtn:hover{
-    opacity:.9;
-  }
-
-</style>
+<link rel="stylesheet" href="result.css">
 </head>
 <body>
 
@@ -66,68 +16,7 @@
   <button onclick="window.location.href='../index.html'">🏠 Home</button>
 </div>
 
-<script>
-  const result = JSON.parse(localStorage.getItem("examResult"));
-
-  if (!result) {
-    document.body.innerHTML = "<h2>No result found</h2>";
-  } else {
-    document.getElementById("score").textContent =
-      `${result.score} / ${result.total}`;
-
-    const status = result.percentage >= result.scoreMin ? "✅ PASSED" : "❌ NOT PASSED";
-
-    let html = `
-      <p>
-        <strong>
-          Score: ${result.percentage}% → <b>${status}</b>
-        </strong>
-      </p>
-      <p>
-        Score min to pass: ${result.scoreMin}%</b>
-      </p>
-    `;
-
-    if (result.percentage >= 70) {
-      result.certificateId = generateCertificateId();
-
-      html += `
-        <button id="certificateBtn" onclick="goToCertificate()">
-          🎓 Get Certificate
-        </button>
-      `;
-    }
-
-    result.done = true;
-    localStorage.setItem("examResult", JSON.stringify(result));
-
-    document.getElementById("summary").innerHTML = html;
-
-    // Result details
-    /*
-    const list = document.createElement("ul");
-
-    result.details.forEach(d => {
-      const li = document.createElement("li");
-      li.textContent = `${d.question} — ${d.isCorrect ? "✔ Correct" : "✖ Incorrect"}`;
-      list.appendChild(li);
-    });
-    
-    document.querySelector(".card").appendChild(list);
-    */
-  }
-
-// get certificate
-function goToCertificate(){
-  window.location.href = "certificate.html";
-}
-
-// Generate Certificate ID
-function generateCertificateId(){
-  return "CERT-" + Date.now().toString(36).toUpperCase();
-}
-
-</script>
+<script src="result.js"></script>
 
 </body>
 </html>
