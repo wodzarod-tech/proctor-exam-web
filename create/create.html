@@ -113,7 +113,7 @@
         <div class="toggle-inline">
           <label class="toggle-row">
             <input type="checkbox" data-proctor="score-min" onchange="toggleScoreMin(this)" />
-            <span>Score minimum to pass (%)</span>
+            <span>Points/Score minimum to pass</span>
           </label>
 
           <div class="score-row" style="display:none">
@@ -123,7 +123,7 @@
                 min="0"
                 step="1"
                 value="0"
-              />%
+              /> points
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@
         <div class="toggle-inline">
           <label class="toggle-row">
             <input type="checkbox" data-proctor="timer-enabled" onchange="toggleTimer(this)" />
-            <span>Timer Left (hour | minutes)</span>
+            <span>Timer Left</span>
           </label>
 
           <div class="timer-row" style="display:none">
@@ -149,7 +149,7 @@
               step="1"
               value="0"
               oninput="fixHour(this); updateTimerJSON()"
-            />h
+            />hour
             <span>:</span>
             <input
               type="number"

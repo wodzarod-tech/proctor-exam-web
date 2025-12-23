@@ -497,7 +497,7 @@
     {
       "text": "¿Cuál es el formato de Certificado que es soportado por el Servicio de Gestión de Servicios de Ether y es usado en APX?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1029,7 +1029,7 @@
     {
       "text": "Para la ejecución en local de APX, ¿en qué parte del pom principal se debe hacer cambios de ruta?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1059,7 +1059,7 @@
     {
       "text": "En APX CLI ¿Cuántos tipos de parámetros existen?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1089,7 +1089,7 @@
     {
       "text": "¿Cuál es la utilidad de APX que permite consumir servicios internos desplegados dentro de la red del banco?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1119,7 +1119,7 @@
     {
       "text": "¿Cuáles son los componentes de Arquitectura básicos, necesarios para que una Transacción APX funcione?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1149,7 +1149,7 @@
     {
       "text": "¿En APX donde se aplica un proceso funcional ACID?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1179,7 +1179,7 @@
     {
       "text": "¿Cuáles son los artefactos básicos que se construyen para la implementación de transacción APX?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1209,7 +1209,7 @@
     {
       "text": "El APIConnector tiene registrado un tiempo de respuesta de:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1239,7 +1239,7 @@
     {
       "text": "Es recomendable llamar dos librerías de una transacción",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1257,7 +1257,7 @@
     {
       "text": "¿Cuáles son los tipos de invocación que se pueden configurar para hacer uso del conector de servicios internos? (múltiple elección)",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1287,7 +1287,7 @@
     {
       "text": "Para consumir servicios de semaas es necesario declarar los roles en:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1309,7 +1309,7 @@
     {
       "text": "¿Cuál es el endpoint de la Arquitectura APX para ejecutar las transacciones?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1339,7 +1339,7 @@
     {
       "text": "¿Cuáles son los tipos de invocación que se pueden configurar para hacer uso del conector de APIs? (múltiple elección)",
       "type": "checkbox",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1369,7 +1369,7 @@
     {
       "text": "Para consumir un servicio por impersonalización que invoke type es necesario registrar en la consola",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1399,7 +1399,7 @@
     {
       "text": "que version de arquitectura apx son productivas",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1429,7 +1429,7 @@
     {
       "text": "cuáles son los códigos de entorno",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1443,7 +1443,7 @@
     {
       "text": "cuál es el formato para la consulta en una base de datos",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1473,7 +1473,7 @@
     {
       "text": "Si se encuentra un problema en el entorno en vivo, ¿Qué tipo de rama de revisión debe crear?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1503,7 +1503,7 @@
     {
       "text": "Si se encuentra un problema en entornos previos, Qué tipo de rama de revisión debe crear?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1529,7 +1529,7 @@
     {
       "text": "Escriba los comandos para generar una transacción en la consola APX (Ejm.: apx local deploy)",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1543,7 +1543,7 @@
     {
       "text": "Escriba los comandos para generar una librería en la consola APX (Ejm.: apx local deploy)",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1557,7 +1557,7 @@
     {
       "text": "Escriba los comandos para generar un dto en la consola APX (Ejm.: apx local deploy)",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1571,7 +1571,7 @@
     {
       "text": "En qué consola modificas las propiedades de base de datos:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1597,7 +1597,7 @@
     {
       "text": "",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1627,7 +1627,7 @@
     {
       "text": "Cómo se llama el header que hace referencia a la transacción?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1641,7 +1641,7 @@
     {
       "text": "Cómo se llama la variable de entorno de APX?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1655,7 +1655,7 @@
     {
       "text": "Selecciona la opción donde se modifica las entradas y salidas del documento D520 en la transacción:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1677,7 +1677,7 @@
     {
       "text": "dentro de un proyecto donde se realiza la configuración para la conexión a bd",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1703,7 +1703,7 @@
     {
       "text": "¿En qué componente APX Batch se establece la conexión a Base de Datos?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1733,7 +1733,7 @@
     {
       "text": "El consumo de una transacción APX se realiza mediante el método HTTP?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1763,7 +1763,7 @@
     {
       "text": "Dónde se ubica el archivo sql.UUAAR001IMPL.properties",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1785,7 +1785,7 @@
     {
       "text": "Cuándo es recomendable hacer el diagrama de componentes",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1807,7 +1807,7 @@
     {
       "text": "A quien se solicita accesos para la consola apx",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1833,7 +1833,7 @@
     {
       "text": "Qué perfil debo tener para poder aprobar Pull Request?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1855,7 +1855,7 @@
     {
       "text": "Si quiero agregar una dependencia en la librería, qué comando debo usar?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1877,7 +1877,7 @@
     {
       "text": "Cuál es el comando para eliminar una librería externa?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1891,7 +1891,7 @@
     {
       "text": "Cuál es el comando para eliminar un parámetro de entrada?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1905,7 +1905,7 @@
     {
       "text": "Cuál es el comando para ver las dependencias?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1919,7 +1919,7 @@
     {
       "text": "Cómo se llama el documento que tiene las especificaciones que son necesarias que debe tener la transacción?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1945,7 +1945,7 @@
     {
       "text": "Cuántos tipos de tickets gobierno existe? - para el gobierno de APX",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1967,7 +1967,7 @@
     {
       "text": "Cuántos tipos de tickets de gobierno de Arquitectura existen?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -1989,7 +1989,7 @@
     {
       "text": "En el gobierno de APX, cómo se llama el ticket generado para nuevos componentes?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2011,7 +2011,7 @@
     {
       "text": "considerando que tienes un ticket APX Component Express Modification, es necesario pasar el ticket por certificación octa?.",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2029,7 +2029,7 @@
     {
       "text": "puedo desplegar una feature en calidad",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2047,7 +2047,7 @@
     {
       "text": "en el descriptor, cómo reconoces un parámetro obligatorio?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2061,7 +2061,7 @@
     {
       "text": "Cuando ejecutamos una malla para su ejecución, en qué estado inicia?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2091,7 +2091,7 @@
     {
       "text": "Un proceso batch APX puede consumir un API external",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2109,7 +2109,7 @@
     {
       "text": "¿Qué interface se utiliza para declarar un writer en un APX Batch?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2135,7 +2135,7 @@
     {
       "text": "Los steps van a poder ser de dos tipos:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2149,7 +2149,7 @@
     {
       "text": "Qué son el Reader, Process y Writer?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2179,7 +2179,7 @@
     {
       "text": "Qué tipos de parámetros soporta un job APX?",
       "type": "checkbox",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2209,7 +2209,7 @@
     {
       "text": "En qué tecnología está basado APX Batch?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2239,7 +2239,7 @@
     {
       "text": "Qué herramientas utilizamos para llevar a producción una malla Control M?",
       "type": "checkbox",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2269,7 +2269,7 @@
     {
       "text": "qué tipos de batch existe",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2283,7 +2283,7 @@
     {
       "text": "¿Qué proceso en batch job realiza el commit?. ¿En qué componente, se procesa el bloque de registros definidos por el límite del intervalo (commit)?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2313,7 +2313,7 @@
     {
       "text": "¿Qué interface de Spring Batch se usa en el writer para poder generar un archivo en FileX?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2343,7 +2343,7 @@
     {
       "text": "Para la UUAA PAPX, ¿Cuál de los siguientes namespace sería lo correcto?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2373,7 +2373,7 @@
     {
       "text": "¿Qué ruta de FileX se usa desde un apx batch para leer un archivo json?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2403,7 +2403,7 @@
     {
       "text": "¿Cuál es el comando de APX CLI para crear un job?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2433,7 +2433,7 @@
     {
       "text": "¿Cuáles son los tipos de JOBs APX? (múltiple elección)",
       "type": "checkbox",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2463,7 +2463,7 @@
     {
       "text": "Para crear un recurso en ether de tipo proceso batch ¿Cuál sería la nomenclatura correcta?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2493,7 +2493,7 @@
     {
       "text": " en control m que tipo de job utiliza un apx batch para la infraestructura r3",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2523,7 +2523,7 @@
     {
       "text": "¿Qué es un namespace?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2553,7 +2553,7 @@
     {
       "text": "cuando un job falla, es obligatorio notificar?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2583,7 +2583,7 @@
     {
       "text": "cuales son los steps dentro de chunk",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2597,7 +2597,7 @@
     {
       "text": "¿En qué componente se pueden realizar el grabado de registros a una base de datos?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2627,7 +2627,7 @@
     {
       "text": "Un job se deploya e instala en prod?:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2653,7 +2653,7 @@
     {
       "text": "Con respecto a la conexión a Elastic, ¿qué hace la propiedad routing?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2679,7 +2679,7 @@
     {
       "text": "Con respecto a la conexión a Elastic, los valores NO permitidos para la variable “operation” son:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2705,7 +2705,7 @@
     {
       "text": "Sobre APX Batch Physics, seleccione la(s) respuesta(s) correcta(s):",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2731,7 +2731,7 @@
     {
       "text": "Qué versión de Physics completa el pase a prod o algo asi?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2757,7 +2757,7 @@
     {
       "text": "¿Qué tipo de parámetro se debe utilizar para contabilizar registros en mongoDb?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2787,7 +2787,7 @@
     {
       "text": "¿Las propiedades de mongo referencia a la base de datos física y lógica?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2817,7 +2817,7 @@
     {
       "text": "Para realizar un insert desde una transacción a la base de datos mongoDb, se utiliza el tipo de parámetro",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2847,7 +2847,7 @@
     {
       "text": "Qué propiedad se utiliza para la inserción de muchos registros en Mongo DB",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2861,7 +2861,7 @@
     {
       "text": "Desde la lógica de negocio en la implementación de la librería, como hacemos referencia a las propiedades de mongo en la consola APX?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2891,7 +2891,7 @@
     {
       "text": "Los documentos de mongoDb en una librería APX se expresan como:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2921,7 +2921,7 @@
     {
       "text": "¿Cuál es la cantidad máxima de registros que puede devolver el conector a Oracle en una consulta?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2951,7 +2951,7 @@
     {
       "text": "¿Cuál de los siguientes métodos de jdbcUtils se usaría para traer una lista de registros paginados?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -2981,7 +2981,7 @@
     {
       "text": "Que método trae las consultas paginadas en Oracle.? ¿Cuál de los siguientes métodos de jdbcUtils se usaría para traer una lista de Mapas paginadas?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3011,7 +3011,7 @@
     {
       "text": "Marque la propiedad que no debe ir a producción",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3041,7 +3041,7 @@
     {
       "text": "qué job se utiliza para grabar en db oracle",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3055,7 +3055,7 @@
     {
       "text": "tipos de operaciones Oracle",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3069,7 +3069,7 @@
     {
       "text": "Que método se usa para insertar en Oracle",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3095,7 +3095,7 @@
     {
       "text": "Dentro de los componentes de APX, ¿Dónde se define la consulta a la BD Oracle?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3125,7 +3125,7 @@
     {
       "text": "¿Cómo se llama la utilidad de APX para poder conectarse a una BD Oracle?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3155,7 +3155,7 @@
     {
       "text": "Si quiero grabar en una base de datos ORACLE, ¿Qué tipo de JOB se puede utilizar? (múltiple elección)",
       "type": "checkbox",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3197,7 +3197,7 @@
     {
       "text": "En una librería APX ¿Cómo se envían los parámetros de variable a la utilidad que permite ejecutar operaciones en Oracle?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3227,7 +3227,7 @@
     {
       "text": "¿Cuál query es una buena práctica para consultar una BD oracle que se requiere filtrar por un campo constante?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3257,7 +3257,7 @@
     {
       "text": "Cuántas TRX como máximo se pueden enviar en cics:",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3287,7 +3287,7 @@
     {
       "text": "que protocolo apx cisc conector",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {
@@ -3301,7 +3301,7 @@
     {
       "text": "El tiempo de respuesta considerado por defecto para cics?",
       "type": "radio",
-      "points": 0,
+      "points": 1,
       "required": false,
       "options": [
         {

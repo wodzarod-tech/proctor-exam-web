@@ -17,7 +17,7 @@ function updateTotalPoints(){
   });
 
   document.getElementById('totalPoints').textContent =
-    total % 1 === 0 ? total : total.toFixed(2);
+    total % 1 === 0 ? total : total.toFixed(1);
 }
 
 /***************************
@@ -29,6 +29,10 @@ document.addEventListener('input', e => {
     e.target.classList.contains('opt-text')){
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
+  }
+
+  if (e.target.classList.contains('points-input')) {
+    updateTotalPoints();
   }
 
   updateJSON();
@@ -69,15 +73,17 @@ document.addEventListener('click', e => {
     const feedback = card.querySelector('.feedback');
 
     // Auto-open ONLY if user hasn't manually collapsed it
+    debugger;
     if (feedback && !feedback.dataset.userCollapsed) {
       feedback.classList.remove('collapsed');
+
+      feedback.querySelectorAll('textarea')
+      .forEach(autoResizeTextarea);
     }
   }
   else {
     // DO NOT blur if clicking an editable element
-    if (
-      e.target.closest('input, textarea, [contenteditable]')
-    ) {
+    if (e.target.closest('input, textarea, [contenteditable]')) {
       return;
     }
 
@@ -136,9 +142,9 @@ function addQuestion(){
         <input type="number"
           class="points-input"
           min="0"
-          step="0.01"
+          step="0.1"
           placeholder="0"
-          oninput="limitDecimals(this); updateJSON()" />
+          oninput="limitDecimals(this); updateJSON();" />
         <span>points</span>
       </div>
     </div>
@@ -210,6 +216,7 @@ function addQuestion(){
   updateJSON();
 
   updateQuestionCounters();
+  updateTotalPoints()
 
   // Auto-focus question text:
   // when clicking Add question, then cursor automatically appears in the question text
@@ -247,6 +254,7 @@ function removeQuestion(btn){
   updateJSON();
   updateSectionNumbers();
   updateQuestionCounters();
+  updateTotalPoints();
 }
 
 // points: enforce max 2 decimals
@@ -255,8 +263,8 @@ function limitDecimals(input){
   if (!value.includes('.')) return;
 
   const [int, dec] = value.split('.');
-  if (dec.length > 2){
-    input.value = `${int}.${dec.slice(0,2)}`;
+  if (dec.length > 1){
+    input.value = `${int}.${dec.slice(0,1)}`;
   }
 }
  
@@ -623,6 +631,8 @@ function importJSON(){
 }
 
 document.getElementById('jsonFileInput').addEventListener('change', e => {
+  localStorage.clear();
+  
   const file = e.target.files[0];
   if(!file) return;
 
@@ -738,6 +748,7 @@ function loadFormFromJSON(data){
   updateJSON();
 
   updateQuestionCounters();
+  updateTotalPoints();
 }
 
 // Apply settings automatically
@@ -886,6 +897,7 @@ window.onload = async function() {
   if(json) {
     examData = JSON.parse(json);
   
+    debugger;
     // Load questions
     loadFormFromJSON(examData);
   

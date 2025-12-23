@@ -29,11 +29,15 @@ let examData = null;
 // Auto-grade function (JSON-based, correct)
 function gradeExamFromJSON(){
   let score = 0;
-  let total = examData.questions.length;
+  let total = 0; //examData.questions.length;
   let details = [];
 
   examData.questions.forEach((q, index) => {
     const questionEl = document.querySelectorAll('.question')[index];
+
+    // get total points of exam
+    const points = Number(q.points) || 0;
+    total += points;
 
     // Correct answers from JSON
     const correctOptions = q.options
@@ -49,7 +53,9 @@ function gradeExamFromJSON(){
       correctOptions.length === selectedOptions.length &&
       correctOptions.every(i => selectedOptions.includes(i));
 
-    if (isCorrect) score++;
+    if (isCorrect) {
+      score += points;
+    } 
 
     details.push({
       question: q.text,
@@ -63,9 +69,9 @@ function gradeExamFromJSON(){
 
   return {
     title: examData.title,
-    score,
+    score, /* points from exam */
     scoreMin: examData.settings.general.scoreMin,
-    total,
+    total, /* total points */
     percentage: Math.round((score / total) * 100),
     details
   };
@@ -184,7 +190,7 @@ function addQuestion(){
       <div class="feedback-group ok">
         <div class="feedback-ok-label">
           <span class="feedback-icon">✔</span>
-          <span>Feedback for correct answers:</span>
+          <span>Correct:</span>
         </div>
         <textarea class="q-title q-comment-ok" rows="1" placeholder="Feedback"></textarea>
       </div>
@@ -192,7 +198,7 @@ function addQuestion(){
       <div class="feedback-group error">
         <div class="feedback-error-label">
           <span class="feedback-icon">✖</span>
-          <span>Feedback for incorrect answers:</span>
+          <span>Incorrect:</span>
         </div>
         <textarea class="q-title q-comment-error" rows="1" placeholder="Feedback"></textarea>
       </div>

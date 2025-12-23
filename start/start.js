@@ -72,7 +72,9 @@ async function handleImport(){
   }
 
   try {
-    // 1️Read JSON file (awaitable)
+    localStorage.clear();
+    
+    // Read JSON file (awaitable)
     const examData = await readFileAsJSON(importedFile);
     localStorage.setItem("formContent", JSON.stringify(examData));
 

@@ -1,7 +1,7 @@
   const result = JSON.parse(localStorage.getItem("examResult"));
 
   // Security check
-  if (!result || result.percentage < 70 || !result.certificateId) {
+  if (!result || result.percentage < result.scoreMin || !result.certificateId) {
     document.body.innerHTML = "<h2>Access denied</h2>";
   } else {
     document.getElementById("examTitle").textContent = result.title;

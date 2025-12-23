@@ -1,0 +1,73 @@
+{
+  "title": "basic exam",
+  "description": "desc",
+  "questions": [
+    {
+      "text": "1",
+      "type": "radio",
+      "points": 2.5,
+      "required": false,
+      "options": [
+        {
+          "text": "11",
+          "checked": true
+        },
+        {
+          "text": "22",
+          "checked": false
+        }
+      ],
+      "feedbackOk": "ok",
+      "feedbackError": "error"
+    },
+    {
+      "text": "2",
+      "type": "radio",
+      "points": 1.5,
+      "required": false,
+      "options": [
+        {
+          "text": "22",
+          "checked": false
+        },
+        {
+          "text": "33",
+          "checked": true
+        }
+      ],
+      "feedbackOk": "ok2",
+      "feedbackError": "error2"
+    }
+  ],
+  "settings": {
+    "general": {
+      "shuffleQuestions": false,
+      "shuffleOptions": false,
+      "viewToggleQuestions": false,
+      "viewQuestions": false,
+      "scoreMin": 2
+    },
+    "timer": {
+      "enabled": true,
+      "hours": 0,
+      "minutes": 1
+    },
+    "camera": {
+      "enabled": false,
+      "faceAbsence": false,
+      "eyeTracking": false
+    },
+    "microphone": {
+      "enabled": false,
+      "loudNoise": false
+    },
+    "screen": {
+      "tabSwitch": false,
+      "fullscreenExit": false,
+      "devToolsOpen": false,
+      "leaveFullScreen": false,
+      "blockKeyShortcuts": false,
+      "secondMonitor": false
+    }
+  }
+}

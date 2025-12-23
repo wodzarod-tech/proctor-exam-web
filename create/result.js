@@ -6,20 +6,19 @@
     document.getElementById("score").textContent =
       `${result.score} / ${result.total}`;
 
-    const status = result.percentage >= result.scoreMin ? "✅ PASSED" : "❌ NOT PASSED";
+    const status = result.score >= result.scoreMin ? "✅ PASSED" : "❌ NOT PASSED";
 
     let html = `
       <p>
         <strong>
-          Score: ${result.percentage}% → <b>${status}</b>
-        </strong>
+          Score: ${result.score} → <b>${status}</b>
+        </strong>(Score min to pass: ${result.scoreMin})
       </p>
       <p>
-        Score min to pass: ${result.scoreMin}%</b>
-      </p>
     `;
 
-    if (result.percentage >= 70) {
+    debugger;
+    if (result.score >= result.scoreMin) {
       result.certificateId = generateCertificateId();
 
       html += `
