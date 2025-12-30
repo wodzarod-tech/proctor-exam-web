@@ -88,3 +88,6 @@ PENDINGS:
       <span>Total points</span>
       <strong id="totalPoints">0</strong>
     </div>
+
+## Deploy
+https://superproctorexam.netlify.app/

@@ -3,13 +3,13 @@
   "description": "Examen de programación APX",
   "questions": [
     {
-      "text": "¿Cuál de los siguientes enunciados son incorrectos acerca de la nomenclatura de una transacción?\nquestion test new line a\nquestion test new line b",
+      "text": "¿Cuál de los siguientes enunciados son incorrectos acerca de la nomenclatura de una transacción?",
       "type": "checkbox",
       "points": 1,
       "required": false,
       "options": [
         {
-          "text": "a. Debe haber un código de versión. Este debe ser igual al número del pom.xml\ntest new line a\ntest new line b",
+          "text": "a. Debe haber un código de versión. Este debe ser igual al número del pom.xml",
           "checked": true
         },
         {

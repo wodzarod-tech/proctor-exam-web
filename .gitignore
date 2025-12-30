@@ -1,5 +1,3 @@
-bck/
-
 # Compiled class file
 *.class
 
@@ -26,4 +24,7 @@ hs_err_pid*
 replay_pid*
 
 # others
+bck/
+deploy/
+*.docx
 *.bak
